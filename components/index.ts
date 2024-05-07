@@ -8,6 +8,7 @@ import SearchBar from "./Searchbar";
 import Hero from "./Hero";
 import Carousel from "./Carousel";
 import Tyres from "./Tyres";
+import Slides from "./Slides";
 
 export {
   Hero,
@@ -20,4 +21,5 @@ export {
   SearchBar,
   Carousel,
   Tyres,
+  Slides,
 };

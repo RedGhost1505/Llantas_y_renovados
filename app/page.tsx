@@ -4,15 +4,13 @@ import { fuels, yearsOfProduction } from "@constants";
 import { CarCard, ShowMore, SearchBar, CustomFilter, Hero, Carousel, Tyres } from "@components";
 
 export default async function Home({ searchParams }: HomeProps) {
-  // const allCars = await fetchCars({
-  //   manufacturer: searchParams.manufacturer || "",
-  //   year: searchParams.year || 2022,
-  //   fuel: searchParams.fuel || "",
-  //   limit: searchParams.limit || 10,
-  //   model: searchParams.model || "",
-  // });
-
-  // const isDataEmpty = !Array.isArray(allCars) || allCars.length < 1 || !allCars;
+  const images = [
+    { url: "/Slider-tiendas-2.jpg", alt: "image1" },
+    { url: "/Slider-tiendas-2-q.jpg", alt: "image2" },
+    { url: "/Iguala.jpg", alt: "image3" },
+    { url: "/Tezontle.jpg", alt: "image4" },
+    { url: "/Valle-dorado.jpg", alt: "image5" },
+  ];
 
   return (
     <main className='overflow-hidden'>
@@ -20,6 +18,9 @@ export default async function Home({ searchParams }: HomeProps) {
       <div className='flex mt-16 justify-center items-center'>
         <Carousel />
       </div>
+      {/* <div className='flex mt-20 justify-center items-center'>
+        <Slides images={images} />
+      </div> */}
       <div className='flex mt-20 mb-10 justify-center items-center'>
         <Tyres />
       </div>

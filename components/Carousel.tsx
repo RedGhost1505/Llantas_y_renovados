@@ -24,7 +24,9 @@ const Carousel = () => {
             <button className='bg-[#FF6600] text-white text-xl py-2 px-4 rounded-lg'>Cotiza aquí</button>
 
             <div className='flex justify-center items-center gap-5 mt-10'>
+                <span className='w-10 h-1 bg-[#000000]'></span>
                 <text className='text-black text-2xl font-bold '>Nuestras Marcas</text>
+                <span className='w-10 h-1 bg-[#000000]'></span>
             </div>
 
         </div>

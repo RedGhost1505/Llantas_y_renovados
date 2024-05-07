@@ -8,9 +8,11 @@ const Tyres = () => {
         make: '',
         model: '',
         modification: '',
+        modification_name: '',
         year: '',
         tire: '',
         rim_diameter: '',
+        logo: '',
         user_key: process.env.NEXT_PUBLIC_API_KEY,
     });
 
@@ -60,25 +62,119 @@ const Tyres = () => {
     }, [params]); // Dependencias en el arreglo para reaccionar a cambios en los parámetros
 
 
-    const handleClick = (make: string) => {
+    const handleClick = (make: string, logo: string) => {
         setParams(prevParams => ({
             ...prevParams,
             make: make,
             model: '',  // Restablecer model, year y modification cuando se cambia make
             year: '',
             modification: '',
+            modification_name: '',
             tire: '',
             rim_diameter: '',
+            logo: logo,
         }));
     };
 
     return (
         <div className='flex flex-col w-full' >
-            <div className="flex items-center justify-center text-6xl font-bold mb-10 text-[#FF6600] italic">
+            <div className="flex items-center justify-center text-6xl font-bold mb-5 text-[#FF6600] italic">
                 <span className="inline-block w-20 mr-4 border-t-8 border-[#FF6600]"></span>
                 Cotiza ahora
                 <span className="inline-block w-20 ml-4 border-t-8 border-[#FF6600]"></span>
             </div>
+
+            {params.make && !params.model && (
+                <>
+                    <div className='flex justify-center gap-5 mt-10'>
+                        {/* Al dar click limpia los datos de make y logo */}
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' onClick={() => setParams(prevParams => ({ ...prevParams, make: '', logo: '' }))}>
+                            <Image src={params.logo || '/default-logo.png'} alt={params.make} width={50} height={50} className='object-contain' />
+                            {params.make}
+                        </button>
+                    </div>
+                </>
+            )}
+
+            {params.make && params.model && !params.year && (
+                <>
+                    <div className='flex justify-center gap-5 mt-10'>
+                        {/* Al dar click limpia los datos de model */}
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' disabled>
+                            <Image src={params.logo || '/default-logo.png'} alt={params.make} width={50} height={50} className='object-contain' />
+                            {params.make}
+                        </button>
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' onClick={() => setParams(prevParams => ({ ...prevParams, model: '' }))}>
+                            {params.model}
+                        </button>
+                    </div>
+                </>
+            )}
+
+            {params.make && params.model && params.year && !params.modification && (
+                <>
+                    <div className='flex justify-center gap-5 mt-10'>
+                        {/* Al dar click limpia los datos de year */}
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' disabled>
+                            <Image src={params.logo || '/default-logo.png'} alt={params.make} width={50} height={50} className='object-contain' />
+                            {params.make}
+                        </button>
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' disabled>
+                            {params.model}
+                        </button>
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' onClick={() => setParams(prevParams => ({ ...prevParams, year: '' }))}>
+                            {params.year}
+                        </button>
+                    </div>
+                </>
+            )}
+
+            {params.make && params.model && params.year && params.modification && !params.rim_diameter && !params.tire && (
+                <>
+                    <div className='flex justify-center gap-5 mt-10'>
+                        {/* Al dar click limpia los datos de modification */}
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' disabled>
+                            <Image src={params.logo || '/default-logo.png'} alt={params.make} width={50} height={50} className='object-contain' />
+                            {params.make}
+                        </button>
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' disabled>
+                            {params.model}
+                        </button>
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' disabled>
+                            {params.year}
+                        </button>
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' onClick={() => setParams(prevParams => ({ ...prevParams, modification: '' }))}>
+                            {params.modification_name}
+                        </button>
+                    </div>
+                </>
+            )}
+
+            {params.make && params.model && params.year && params.modification && params.rim_diameter && params.tire && (
+                <>
+                    <div className='flex justify-center gap-5 mt-10'>
+                        {/* Al dar click limpia los datos de rim_diameter y tire */}
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' disabled>
+                            <Image src={params.logo || '/default-logo.png'} alt={params.make} width={50} height={50} className='object-contain' />
+                            {params.make}
+                        </button>
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' disabled>
+                            {params.model}
+                        </button>
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' disabled>
+                            {params.year}
+                        </button>
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' disabled>
+                            {params.modification_name}
+                        </button>
+                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg font-semibold drop-shadow-lg flex items-center gap-2 mb-4' onClick={() => setParams(prevParams => ({ ...prevParams, rim_diameter: '', tire: '' }))}>
+                            <span className='text-4xl'>{params.rim_diameter}</span>
+                            <span className='mx-3 h-full self-stretch border-l-2 border-black' style={{ minHeight: '24px' }}></span> {/* Styling line separator */}
+                            <span className='text-lg'>{params.tire}</span>
+                        </button>
+                    </div>
+                </>
+            )}
 
             {error && <p className="text-red-500">{error}</p>}
             {isLoading ? <p>Loading...</p> : renderContent()}
@@ -91,8 +187,11 @@ const Tyres = () => {
                 return (
                     <div className='overflow-y-auto max-h-[500px] w-full px-5'>
                         <div className='flex flex-wrap justify-center gap-5 mt-10'>
+                            <text className='text-2xl font-bold text-center text-[#B7B6B6]'>Selecciona la marca de tu vehículo</text>
+                        </div>
+                        <div className='flex flex-wrap justify-center gap-5 mt-10'>
                             {data.map((item) => (
-                                <button key={item.id} className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' onClick={() => handleClick(item.slug)}>
+                                <button key={item.id} className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' onClick={() => handleClick(item.slug, item.logo)}>
                                     <Image src={item.logo || '/default-logo.png'} alt={item.name} width={50} height={50} className='object-contain' />
                                     {item.name}
                                 </button>
@@ -104,6 +203,9 @@ const Tyres = () => {
             else if (params.make && !params.model) {
                 return (
                     <div className='overflow-y-auto max-h-[500px] w-full px-5'>
+                        <div className='flex flex-wrap justify-center gap-5 mt-10'>
+                            <text className='text-2xl font-bold text-center text-[#B7B6B6]'>Selecciona el modelo de tu vehículo</text>
+                        </div>
                         <div className='flex flex-wrap justify-center gap-5 mt-10'>
                             {data.map((item) => (
                                 <button key={item.id} className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' onClick={() => setParams(prevParams => ({ ...prevParams, model: item.slug }))}>
@@ -118,6 +220,9 @@ const Tyres = () => {
                 return (
                     <div className='overflow-y-auto max-h-[500px] w-full px-5'>
                         <div className='flex flex-wrap justify-center gap-5 mt-10'>
+                            <text className='text-2xl font-bold text-center text-[#B7B6B6]'>Selecciona el año de tu vehículo</text>
+                        </div>
+                        <div className='flex flex-wrap justify-center gap-5 mt-10'>
                             {data.map((item) => (
                                 <button key={item.id} className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' onClick={() => setParams(prevParams => ({ ...prevParams, year: item.name }))}>
                                     {item.name}
@@ -131,8 +236,11 @@ const Tyres = () => {
                 return (
                     <div className='overflow-y-auto max-h-[500px] w-full px-5'>
                         <div className='flex flex-wrap justify-center gap-5 mt-10'>
+                            <text className='text-2xl font-bold text-center text-[#B7B6B6]'>Selecciona la modificación de tu vehículo</text>
+                        </div>
+                        <div className='flex flex-wrap justify-center gap-5 mt-10'>
                             {data.map((item) => (
-                                <button key={item.id} className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' onClick={() => setParams(prevParams => ({ ...prevParams, modification: item.slug }))}>
+                                <button key={item.id} className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' onClick={() => setParams(prevParams => ({ ...prevParams, modification: item.slug, modification_name: item.name }))}>
                                     {item.name}
                                 </button>
                             ))}
@@ -143,6 +251,9 @@ const Tyres = () => {
             else if (params.make && params.model && params.year && params.modification && !params.rim_diameter && !params.tire) {
                 return (
                     <div className='overflow-y-auto max-h-[500px] w-full px-5'>
+                        <div className='flex flex-wrap justify-center gap-5 mt-10'>
+                            <text className='text-2xl font-bold text-center text-[#B7B6B6]'>Selecciona el tamaño de tus llantas</text>
+                        </div>
                         <div className='flex flex-wrap justify-center gap-5 mt-10'>
                             {data.map((item) => {
                                 if (!item.wheels) return null; // No wheels data, provide fallback or null
@@ -184,8 +295,11 @@ const Tyres = () => {
 
     function renderForm() {
         return (
-            <div className='flex justify-center items-center overflow-y-auto max-h-[600px] w-full px-5'>
-                <form className="space-y-6 w-full max-w-md bg-[#F8F8FE] py-2 px-4 rounded-lg">
+            <div className='flex flex-col justify-center items-center overflow-y-auto max-h-[600px] w-full px-5 mt-5'>
+                <div className='flex flex-wrap justify-center gap-5'>
+                    <text className='text-2xl font-bold text-center text-[#B7B6B6]'>Nos pondremos en contacto</text>
+                </div>
+                <form className="space-y-6 w-full mt-5 max-w-md bg-[#F8F8FE] py-2 px-4 rounded-lg">
                     <div>
                         <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">Nombres</label>
                         <input type="text" id="firstName" name="firstName" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required />
