@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, FormEvent } from 'react';
 import Image from 'next/image';
 
 const Tyres = () => {
@@ -15,6 +15,39 @@ const Tyres = () => {
         logo: '',
         user_key: process.env.NEXT_PUBLIC_API_KEY,
     });
+
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();  // Prevenir el comportamiento de envío predeterminado
+
+        const formData = {
+            firstName: event.currentTarget.firstName.value,
+            lastName: event.currentTarget.lastName.value,
+            email: event.currentTarget.email.value,
+            mobile: event.currentTarget.mobile.value,
+            comments: event.currentTarget.comments.value
+        };
+
+        try {
+            const response = await fetch('/api/mail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                console.log('Mensaje enviado correctamente');
+                alert('Tu mensaje ha sido enviado con éxito.');
+            } else {
+                console.error('Error al enviar mensaje');
+                alert('Hubo un problema al enviar tu mensaje. Por favor, intenta nuevamente.');
+            }
+        } catch (error) {
+            console.error('Error de conexión:', error);
+            alert('Error de conexión al intentar enviar el mensaje.');
+        }
+    };
 
     const [data, setData] = useState([]); // Estado para almacenar los datos de la API [opcional]
     const [error, setError] = useState('');
@@ -299,7 +332,7 @@ const Tyres = () => {
                 <div className='flex flex-wrap justify-center gap-5'>
                     <text className='text-2xl font-bold text-center text-[#B7B6B6]'>Nos pondremos en contacto</text>
                 </div>
-                <form className="space-y-6 w-full mt-5 max-w-md bg-[#F8F8FE] py-2 px-4 rounded-lg">
+                <form onSubmit={handleSubmit} className="space-y-6 w-full mt-5 max-w-md bg-[#F8F8FE] py-2 px-4 rounded-lg">
                     <div>
                         <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">Nombres</label>
                         <input type="text" id="firstName" name="firstName" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required />

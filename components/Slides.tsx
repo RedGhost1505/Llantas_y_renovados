@@ -1,5 +1,16 @@
+'use client'
 import React from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import SwiperCore, { Autoplay, Pagination, Navigation } from 'swiper/core';
 
+// Importa estilos necesarios
+import 'swiper/swiper.min.css';
+import 'swiper/components/navigation/navigation.min.css';
+import 'swiper/components/pagination/pagination.min.css';
+import 'swiper/components/scrollbar/scrollbar.min.css';
+
+// Registra los módulos en SwiperCore
+SwiperCore.use([Autoplay, Pagination, Navigation]);
 
 // Definición de la interfaz para los elementos de imagen
 interface ImageItem {
@@ -13,45 +24,34 @@ interface CarouselProps {
 }
 
 const Slides: React.FC<CarouselProps> = ({ images }) => {
-    const settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 3,
-        slidesToScroll: 3,
-        autoplay: true,
-        autoplaySpeed: 2000,
-        cssEase: "linear",
-        responsive: [
-            {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 2,
-                    infinite: true,
-                    dots: true
-                }
-            },
-            {
-                breakpoint: 600,
-                settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                    initialSlide: 1
-                }
-            }
-        ]
-    };
-
     return (
-        <div style={{ width: '90%', margin: '0 auto' }}>
-            {/* <Slider {...settings}>
+        <div style={{ width: '50%', overflow: 'hidden' }}>
+            <Swiper
+                spaceBetween={50}
+                slidesPerView={1}
+                pagination={{ clickable: true }}
+                navigation={true}
+                autoplay={{
+                    delay: 200,
+                    disableOnInteraction: false,
+                }}
+                breakpoints={{
+                    600: {
+                        slidesPerView: 1,
+                        spaceBetween: 20
+                    },
+                    1024: {
+                        slidesPerView: 2,
+                        spaceBetween: 30
+                    }
+                }}
+            >
                 {images.map((image, index) => (
-                    <div key={index}>
-                        <img src={image.url} alt={image.alt} style={{ width: '100%', height: 'auto' }} />
-                    </div>
+                    <SwiperSlide key={index}>
+                        <img src={image.url} alt={image.alt} style={{ width: '100%', height: '50vh', objectFit: 'cover' }} />
+                    </SwiperSlide>
                 ))}
-            </Slider> */}
+            </Swiper>
         </div>
     );
 };
