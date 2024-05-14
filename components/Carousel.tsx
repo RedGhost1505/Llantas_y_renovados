@@ -17,7 +17,7 @@ const Carousel = () => {
 
             <div className='flex justify-center items-center gap-5 mt-10'>
                 <span className='w-10 h-1 bg-[#000000]'></span>
-                <text className='text-black text-2xl font-bold '>Nuestras Marcas</text>
+                <text className='text-black text-2xl font-bold '>Nuestras sucursales</text>
                 <span className='w-10 h-1 bg-[#000000]'></span>
             </div>
 

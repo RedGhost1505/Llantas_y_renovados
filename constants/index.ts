@@ -72,12 +72,11 @@ export const fuels = [
 
 export const footerLinks = [
   {
-    title: "About",
+    title: "Contacto",
     links: [
-      { title: "How it works", url: "/" },
-      { title: "Featured", url: "/" },
-      { title: "Partnership", url: "/" },
-      { title: "Bussiness Relation", url: "/" },
+      { title: "(+52) 222 723 7935", url: "/" },
+      { title: "llyrgeneralasociados@gmail.com", url: "/" },
+      { title: "Canal de Tezontle 53, \nIztapalapa, 09030 Ciudad de México,\n CDMX", url: "/" },
     ],
   },
   {

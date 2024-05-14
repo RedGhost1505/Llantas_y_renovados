@@ -2,6 +2,24 @@
 import React, { useEffect, useState, FormEvent } from 'react';
 import Image from 'next/image';
 
+interface WheelDetails {
+    rim_diameter: string;
+    tire: string;
+}
+
+interface Wheel {
+    front?: WheelDetails;
+    rear?: WheelDetails;
+}
+
+interface Vehicle {
+    id: string;
+    name: string;
+    slug: string;
+    logo: string;
+    wheels?: Wheel[];
+}
+
 const Tyres = () => {
     // Estado para almacenar parámetros de búsqueda
     const [params, setParams] = useState({
@@ -24,7 +42,13 @@ const Tyres = () => {
             lastName: event.currentTarget.lastName.value,
             email: event.currentTarget.email.value,
             mobile: event.currentTarget.mobile.value,
-            comments: event.currentTarget.comments.value
+            comments: event.currentTarget.comments.value,
+            make: params.make,
+            model: params.model,
+            year: params.year,
+            modification: params.modification_name,
+            tire: params.tire,
+            rim_diameter: params.rim_diameter,
         };
 
         try {
@@ -38,7 +62,7 @@ const Tyres = () => {
 
             if (response.ok) {
                 console.log('Mensaje enviado correctamente');
-                alert('Tu mensaje ha sido enviado con éxito.');
+                alert('Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto.');
             } else {
                 console.error('Error al enviar mensaje');
                 alert('Hubo un problema al enviar tu mensaje. Por favor, intenta nuevamente.');
@@ -49,7 +73,7 @@ const Tyres = () => {
         }
     };
 
-    const [data, setData] = useState([]); // Estado para almacenar los datos de la API [opcional]
+    const [data, setData] = useState<Vehicle[]>([]); // Usando el tipo Vehicle[]
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -289,25 +313,27 @@ const Tyres = () => {
                         </div>
                         <div className='flex flex-wrap justify-center gap-5 mt-10'>
                             {data.map((item) => {
-                                if (!item.wheels) return null; // No wheels data, provide fallback or null
-                                return item.wheels.map((wheel, index) => {
-                                    const frontWheel = wheel.front;
-                                    if (!frontWheel) return null; // No front wheel data, skip this iteration
-
+                                return item.wheels?.map((wheel, index) => {
+                                    if (!wheel.front) {
+                                        return null;  // Skip rendering this button if no front wheel data is available.
+                                    }
                                     return (
                                         <button
                                             key={`${item.id}-${index}`}
-                                            className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg font-semibold drop-shadow-lg flex items-center gap-2 mb-4'
-                                            onClick={() => setParams(prevParams => ({
-                                                ...prevParams,
-                                                rim_diameter: frontWheel.rim_diameter,
-                                                tire: frontWheel.tire,
-                                            }))
-                                            }
+                                            className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg font-semibold drop-shadow-lg flex items-back gap-2 mb-4'
+                                            onClick={() => {
+                                                if (wheel.front) {  // Direct check inside the handler
+                                                    setParams(prevParams => ({
+                                                        ...prevParams,
+                                                        rim_diameter: wheel.front?.rim_diameter || '',
+                                                        tire: wheel.front?.tire || '',
+                                                    }));
+                                                }
+                                            }}
                                         >
-                                            <span className='text-4xl'>{frontWheel.rim_diameter}</span>
-                                            <span className='mx-3 h-full self-stretch border-l-2 border-black' style={{ minHeight: '24px' }}></span> {/* Styling line separator */}
-                                            <span className='text-lg'>{frontWheel.tire}</span>
+                                            <span className='text-4xl'>{wheel.front?.rim_diameter}</span>
+                                            <span className='mx-3 h-full self-stretch border-l-2 border-black' style={{ minHeight: '24px' }}></span>
+                                            <span className='text-lg'>{wheel.front?.tire}</span>
                                         </button>
                                     );
                                 });
@@ -351,7 +377,7 @@ const Tyres = () => {
                     </div>
                     <div>
                         <label htmlFor="comments" className="block text-sm font-medium text-gray-700">Especificaciones Adicionales</label>
-                        <textarea id="comments" name="comments" rows="3" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                        <textarea id="comments" name="comments" rows={3} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
                     </div>
                     <div className="flex justify-end">
                         <button type="submit" className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">Cotiza</button>

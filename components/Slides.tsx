@@ -16,6 +16,8 @@ SwiperCore.use([Autoplay, Pagination, Navigation]);
 interface ImageItem {
     url: string;
     alt: string;
+    ub: string;
+    loc: string;
 }
 
 // Props del componente Carousel
@@ -23,16 +25,21 @@ interface CarouselProps {
     images: ImageItem[];
 }
 
+const handleSearchClick = (searchQuery: string): void => {
+    const encodedQuery = encodeURIComponent(searchQuery);
+    window.open(`https://www.google.com/search?q=Llantas y Renovado ${encodedQuery}`, '_blank');
+};
+
 const Slides: React.FC<CarouselProps> = ({ images }) => {
     return (
-        <div style={{ width: '50%', overflow: 'hidden' }}>
+        <div style={{ width: '100%', overflow: 'hidden' }}>
             <Swiper
                 spaceBetween={50}
                 slidesPerView={1}
                 pagination={{ clickable: true }}
                 navigation={true}
                 autoplay={{
-                    delay: 200,
+                    delay: 5000,
                     disableOnInteraction: false,
                 }}
                 breakpoints={{
@@ -48,7 +55,23 @@ const Slides: React.FC<CarouselProps> = ({ images }) => {
             >
                 {images.map((image, index) => (
                     <SwiperSlide key={index}>
-                        <img src={image.url} alt={image.alt} style={{ width: '100%', height: '50vh', objectFit: 'cover' }} />
+                        <div className="relative w-full h-[50vh]">
+                            <img src={image.url} alt={image.alt} className="absolute w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-80">
+                                <div className="absolute inset-0 flex flex-col justify-center items-center text-white">
+                                    <img src="/favicon1.png" className="w-20" />
+                                    <h2 className="text-3xl font-bold">{image.ub}</h2>
+                                    {/* Render image.loc with line breaks and make it clickable */}
+                                    <div className="text-md text-center" style={{ cursor: 'pointer' }}>
+                                        {image.loc.split('\n').map((line, index) => (
+                                            <React.Fragment key={index}>
+                                                <span onClick={() => handleSearchClick(line)}>{line}</span><br />
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </SwiperSlide>
                 ))}
             </Swiper>

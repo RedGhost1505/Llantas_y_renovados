@@ -17,7 +17,7 @@ const NavBar = () => (
       </Link>
 
       <div className="flex gap-10">
-        <Link href='/' className='flex justify-center items-center'>
+        <Link href='https://www.facebook.com/people/Llantas-Y-Renovado-General-Asociados/61556635631140/?locale=es_LA' className='flex justify-center items-center'>
           <Image
             src='/facebook.svg'
             alt='search'
@@ -26,7 +26,7 @@ const NavBar = () => (
             className='object-contain'
           />
         </Link>
-        <Link href='/' className='flex justify-center items-center'>
+        <Link href='https://www.instagram.com/llantasyrenovado/' className='flex justify-center items-center'>
           <Image
             src='/instagram.svg'
             alt='search'
@@ -35,7 +35,7 @@ const NavBar = () => (
             className='object-contain'
           />
         </Link>
-        <Link href='/' className='flex justify-center items-center'>
+        <Link href='https://api.whatsapp.com/send/?phone=5212227237935&text&type=phone_number&app_absent=0' className='flex justify-center items-center'>
           <Image
             src='whatsapp.svg'
             alt='search'
