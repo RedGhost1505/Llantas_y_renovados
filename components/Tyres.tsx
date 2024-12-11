@@ -406,7 +406,7 @@ const Tyres = () => {
 
     function renderCards() {
         return (
-            <Cards />
+            <Cards rim_diameter={params.rim_diameter} tire={params.tire} />
         );
     }
 }
