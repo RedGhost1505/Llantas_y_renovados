@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model consolidado {
+  codigo         String  @id @unique
+  fuente         String?
+  marca          String?
+  width          Float?
+  aspect_ratio   String?
+  construction   String?
+  diameter       String?
+  modelo         String?
+  rango_carga    String?
+  rango_velocidad String?
+  runflat        String?
+  uso            String?
+  capas          String?
+  may            Float?
+  exist          Float?
+  fuente_imagen  String?
+}

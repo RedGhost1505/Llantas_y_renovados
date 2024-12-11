@@ -1,6 +1,8 @@
 "use client";
 import React, { useEffect, useState, FormEvent } from 'react';
 import Image from 'next/image';
+import Cards from './Cards';
+import '../styles/Spinner.css'; // Este archivo contendrá los estilos para el spinner
 
 interface WheelDetails {
     rim_diameter: string;
@@ -141,6 +143,17 @@ const Tyres = () => {
                 <span className="inline-block w-20 ml-4 border-t-8 border-[#FF6600]"></span>
             </div>
 
+            <h1 className="text-2xl font-bold text-center text-[#B7B6B6] pt-4">¿Ya tienes tus medidas?</h1>
+            <div className="flex justify-center mt-4">
+                <input
+                    type="text"
+                    placeholder="Por ejemplo: 225/45/R17"
+                    className="border border-gray-300 rounded-md p-2 w-full max-w-md"
+                />
+                <button className="bg-[#FF6600] text-white font-semibold rounded-md p-2 ml-2">Buscar</button>
+            </div>
+            <h1 className="text-2xl font-bold text-center text-[#B7B6B6] pt-4 pb-4">o</h1>
+
             {params.make && !params.model && (
                 <>
                     <div className='flex justify-center gap-5 mt-10'>
@@ -234,7 +247,11 @@ const Tyres = () => {
             )}
 
             {error && <p className="text-red-500">{error}</p>}
-            {isLoading ? <p>Loading...</p> : renderContent()}
+            {isLoading ? (
+                <div className="flex items-center justify-center mt-10"> {/* Contenedor centrado */}
+                    <div className="spinner"></div>
+                </div>
+            ) : renderContent()}
         </div>
     );
 
@@ -343,7 +360,7 @@ const Tyres = () => {
                 );
             }
             else if (params.make && params.model && params.year && params.modification && params.rim_diameter && params.tire) {
-                return renderForm();
+                return renderCards();
             }
 
             // Puedes agregar más condiciones y renderizados aquí
@@ -384,6 +401,12 @@ const Tyres = () => {
                     </div>
                 </form>
             </div>
+        );
+    }
+
+    function renderCards() {
+        return (
+            <Cards />
         );
     }
 }
