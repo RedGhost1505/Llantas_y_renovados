@@ -83,6 +83,38 @@ const Tyres = () => {
 
     const filterTireData = (rim_diameter: string, tire: string) => {
         console.log("Filtering tire data with rim diameter:", rim_diameter, "and tire:", tire);
+
+        // Extraer los últimos 3 caracteres del valor de tire (por ejemplo, "ZR19" o "R19")
+        const match = tire.match(/([A-Z])(\d{2})$/);
+
+        if (match) {
+            const construction = match[1]; // "R"
+            const diameter = match[2]; // "19"
+
+            console.log("NewConstruction:", construction);
+            console.log("NewDiameter:", diameter);
+
+            // Filtrar los datos de tireData usando la construcción y el diámetro
+            const tolerance = 1; // Define el rango de tolerancia que quieras
+            const filtered = tireData.filter((data) => {
+                const dataDiameter = Number(data.diameter); // Asegúrate de que sea un número
+                const diameterValue = Number(diameter); // Asegúrate de que sea un número
+
+                return (
+                    data.construction === construction &&  // Comparar la construcción
+                    (dataDiameter >= diameterValue - tolerance && dataDiameter <= diameterValue + tolerance)
+                );
+            });
+
+            // Actualizar el estado de los datos filtrados
+            setFilteredTireData(filtered);
+
+            console.log("Filtered tire data:", filtered);
+            return filtered;
+        } else {
+            console.error("No valid tire data found.");
+            return null;
+        }
     };
 
 
@@ -431,7 +463,7 @@ const Tyres = () => {
 
     function renderCards() {
         return (
-            <Cards rim_diameter={params.rim_diameter} tire={params.tire} tireData={tireData} />
+            <Cards rim_diameter={params.rim_diameter} tire={params.tire} tireData={filteredTireData} />
         );
     }
 }
