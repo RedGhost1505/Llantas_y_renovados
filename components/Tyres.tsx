@@ -78,6 +78,13 @@ const Tyres = () => {
     const [data, setData] = useState<Vehicle[]>([]); // Usando el tipo Vehicle[]
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [tireData, setTireData] = useState<any[]>([]);
+    const [filteredTireData, setFilteredTireData] = useState<any[]>([]);
+
+    const filterTireData = (rim_diameter: string, tire: string) => {
+        console.log("Filtering tire data with rim diameter:", rim_diameter, "and tire:", tire);
+    };
+
 
     // Función para realizar la solicitud GET a la API
     const fetchData = async () => {
@@ -119,6 +126,23 @@ const Tyres = () => {
         fetchData();
         console.log("Updated params:", params); // Log para verificar los parámetros actualizados
     }, [params]); // Dependencias en el arreglo para reaccionar a cambios en los parámetros
+
+    // Fetch data from API
+    useEffect(() => {
+        const fetchTireData = async () => {
+            try {
+                const response = await fetch('/api/db'); // Replace with your API endpoint
+                const data = await response.json();
+                console.log("Data", data);
+                setTireData(data);
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                setError('Failed to load data');
+            }
+        };
+
+        fetchTireData();
+    }, []);
 
 
     const handleClick = (make: string, logo: string) => {
@@ -345,6 +369,7 @@ const Tyres = () => {
                                                         rim_diameter: wheel.front?.rim_diameter || '',
                                                         tire: wheel.front?.tire || '',
                                                     }));
+                                                    filterTireData(wheel.front?.rim_diameter || '', wheel.front?.tire || '');
                                                 }
                                             }}
                                         >
@@ -406,7 +431,7 @@ const Tyres = () => {
 
     function renderCards() {
         return (
-            <Cards rim_diameter={params.rim_diameter} tire={params.tire} />
+            <Cards rim_diameter={params.rim_diameter} tire={params.tire} tireData={tireData} />
         );
     }
 }

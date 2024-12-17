@@ -5,46 +5,16 @@ import tyre from '../public/goodyear-assurance-fuel-max.jpg';
 interface CardProps {
     rim_diameter: string;  // Adjust the type based on your needs
     tire: string;          // Adjust the type based on your needs
+    tireData: any[];       // Adjust the type based on your needs
 }
 
-const Cards: React.FC<CardProps> = ({ rim_diameter, tire }) => {
+const Cards: React.FC<CardProps> = ({ rim_diameter, tire, tireData }) => {
 
     const rimDiameter = rim_diameter;
     const construction = tire;
 
     console.log("Rim Diameter:", rimDiameter);
     console.log("Construction:", construction);
-
-    const [tireData, setTireData] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    // Fetch data from API
-    useEffect(() => {
-        const fetchTireData = async () => {
-            try {
-                const response = await fetch('/api/db'); // Replace with your API endpoint
-                const data = await response.json();
-                console.log("Data", data);
-                setTireData(data);
-                setLoading(false);
-            } catch (err) {
-                console.error('Error fetching data:', err);
-                setError('Failed to load data');
-                setLoading(false);
-            }
-        };
-
-        fetchTireData();
-    }, []);
-
-    // Loading or error state
-    if (loading) return (
-        <div className="flex items-center justify-center mt-10"> {/* Contenedor centrado */}
-            <div className="spinner"></div>
-        </div>
-    );
-    if (error) return <p>{error}</p>;
 
     return (
         <div className="flex flex-col items-center mt-10">
