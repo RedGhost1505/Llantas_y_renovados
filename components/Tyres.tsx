@@ -84,38 +84,62 @@ const Tyres = () => {
     const filterTireData = (rim_diameter: string, tire: string) => {
         console.log("Filtering tire data with rim diameter:", rim_diameter, "and tire:", tire);
 
-        // Extraer los últimos 3 caracteres del valor de tire (por ejemplo, "ZR19" o "R19")
-        const match = tire.match(/([A-Z])(\d{2})$/);
+        // Asegurarse de que el formato de tire sea el correcto, por ejemplo "225/45ZR19"
+        const match = tire.match(/([A-Z])(\d{2})$/); // Extraer la construcción y el diámetro
 
         if (match) {
-            const construction = match[1]; // "R"
-            const diameter = match[2]; // "19"
+            const tireParts = tire.split('/'); // Dividir por "/"
 
-            console.log("NewConstruction:", construction);
-            console.log("NewDiameter:", diameter);
+            // Asegurarse de que tenemos dos partes después de dividir
+            if (tireParts.length === 2) {
+                const width = Number(tireParts[0]); // Convertir a número "225"
+                const aspect_ratio = Number(tireParts[1].match(/^\d+/)?.[0]); // Convertir a número "45", solo los números antes de las letras
+                const diameter = match[2]; // "19"
 
-            // Filtrar los datos de tireData usando la construcción y el diámetro
-            const tolerance = 1; // Define el rango de tolerancia que quieras
-            const filtered = tireData.filter((data) => {
-                const dataDiameter = Number(data.diameter); // Asegúrate de que sea un número
-                const diameterValue = Number(diameter); // Asegúrate de que sea un número
+                console.log("NewDiameter:", diameter);
+                console.log("NewWidth:", width);
+                console.log("NewAspectRatio:", aspect_ratio);
 
-                return (
-                    data.construction === construction &&  // Comparar la construcción
-                    (dataDiameter >= diameterValue - tolerance && dataDiameter <= diameterValue + tolerance)
-                );
-            });
+                if (isNaN(width) || isNaN(aspect_ratio)) {
+                    console.error("Invalid width or aspect ratio found.");
+                    return null;
+                }
 
-            // Actualizar el estado de los datos filtrados
-            setFilteredTireData(filtered);
+                // Definir las tolerancias
+                const tolerance = 1; // Tolerancia para el diámetro
+                const widthTolerance = 2; // Tolerancia para el ancho
+                const aspectRatioTolerance = 2; // Tolerancia para el aspecto
 
-            console.log("Filtered tire data:", filtered);
-            return filtered;
+                // Filtrar los datos de tireData usando width, aspect_ratio y diameter
+                const filtered = tireData.filter((data) => {
+                    const dataWidth = Number(data.width); // Asegurarse de que sea un número
+                    const dataAspectRatio = Number(data.aspect_ratio); // Asegurarse de que sea un número
+                    const dataDiameter = Number(data.diameter); // Asegurarse de que sea un número
+                    const diameterValue = Number(diameter); // Asegurarse de que sea un número
+
+                    // Comparar width, aspect_ratio y diameter con sus respectivas tolerancias
+                    return (
+                        dataWidth >= width - widthTolerance && dataWidth <= width + widthTolerance &&  // Comparar el ancho del neumático con tolerancia
+                        dataAspectRatio >= aspect_ratio - aspectRatioTolerance && dataAspectRatio <= aspect_ratio + aspectRatioTolerance && // Comparar el aspecto del neumático con tolerancia
+                        (dataDiameter >= diameterValue - tolerance && dataDiameter <= diameterValue + tolerance) // Comparar diámetro con tolerancia
+                    );
+                });
+
+                // Actualizar el estado de los datos filtrados
+                setFilteredTireData(filtered);
+
+                console.log("Filtered tire data:", filtered);
+                return filtered;
+            } else {
+                console.error("Invalid tire format. Expected format like '225/45ZR19'.");
+                return null;
+            }
         } else {
             console.error("No valid tire data found.");
             return null;
         }
     };
+
 
 
     // Función para realizar la solicitud GET a la API

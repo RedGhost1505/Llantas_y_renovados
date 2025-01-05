@@ -29,6 +29,12 @@ const Cards: React.FC<CardProps> = ({ rim_diameter, tire, tireData }) => {
         });
     };
 
+    const getCardWidthClass = () => {
+        if (tireData.length === 1) return 'lg:w-3/4'; // Ocupa 75% del ancho en pantallas grandes cuando hay una tarjeta
+        if (tireData.length === 2) return 'lg:w-3/4'; // Ocupa 50% del ancho en pantallas grandes cuando hay dos tarjetas
+        return 'lg:w-1/4'; // Ocupa 25% del ancho cuando hay más de dos tarjetas
+    };
+
     return (
         <div className="flex flex-col items-center mt-10">
             <div className='flex justify-center mt-10 mb-4'>
@@ -37,8 +43,8 @@ const Cards: React.FC<CardProps> = ({ rim_diameter, tire, tireData }) => {
 
             <div className='flex flex-wrap justify-center'>
                 {tireData.map((tire) => (
-                    <div key={tire.codigo} className="flex justify-center w-full md:w-1/2 lg:w-1/4 py-4 px-0">
-                        <div className="bg-[#F8F8FE] drop-shadow-lg rounded-lg p-6 max-w-md w-[350px]">
+                    <div key={tire.codigo} className={`flex justify-center w-full md:w-1/2 ${getCardWidthClass()} py-4 px-0`}>
+                        <div className="bg-[#F8F8FE] drop-shadow-lg rounded-lg p-6 max-w-md w-[350px] flex flex-col justify-between h-full">
                             <div className="flex justify-center">
                                 <div className="w-[200px] h-[200px]">
                                     <Image
@@ -67,24 +73,31 @@ const Cards: React.FC<CardProps> = ({ rim_diameter, tire, tireData }) => {
                                 </p>
                             </div>
 
-                            <div className='w-full flex flex-row justify-between items-center mt-8'>
+                            <div className='w-full flex flex-row justify-between items-center mt-auto'>
                                 <p className="col-span-2 font-bold text-xl text-red-500">MX ${tire.may}</p>
 
-                                {/* Condicional para mostrar el botón o el control de cantidad */}
                                 {selectedItems[tire.codigo] ? (
-                                    <div className="flex items-center">
+                                    <div className="flex flex-col items-center">
+                                        <div className="flex items-center">
+                                            <button
+                                                className="bg-gray-300 text-black font-bold py-1 px-3 rounded-l-full hover:bg-gray-400 transition duration-300"
+                                                onClick={() => handleDecrease(tire.codigo)}
+                                            >
+                                                -
+                                            </button>
+                                            <span className="px-4">{selectedItems[tire.codigo]}</span>
+                                            <button
+                                                className="bg-gray-300 text-black font-bold py-1 px-3 rounded-r-full hover:bg-gray-400 transition duration-300"
+                                                onClick={() => handleIncrease(tire.codigo)}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+
                                         <button
-                                            className="bg-gray-300 text-black font-bold py-1 px-3 rounded-l-full hover:bg-gray-400 transition duration-300"
-                                            onClick={() => handleDecrease(tire.codigo)}
+                                            className="mt-4 font-bold bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600 transition duration-300"
                                         >
-                                            -
-                                        </button>
-                                        <span className="px-4">{selectedItems[tire.codigo]}</span>
-                                        <button
-                                            className="bg-gray-300 text-black font-bold py-1 px-3 rounded-r-full hover:bg-gray-400 transition duration-300"
-                                            onClick={() => handleIncrease(tire.codigo)}
-                                        >
-                                            +
+                                            Ordenar
                                         </button>
                                     </div>
                                 ) : (
@@ -98,6 +111,7 @@ const Cards: React.FC<CardProps> = ({ rim_diameter, tire, tireData }) => {
                             </div>
                         </div>
                     </div>
+
                 ))}
             </div>
         </div>
