@@ -3,6 +3,8 @@ import React, { useEffect, useState, FormEvent } from 'react';
 import Image from 'next/image';
 import Cards from './Cards';
 import '../styles/Spinner.css'; // Este archivo contendrá los estilos para el spinner
+import InputMask from 'react-input-mask';
+import { render } from '@node_modules/@headlessui/react/dist/utils/render';
 
 interface WheelDetails {
     rim_diameter: string;
@@ -80,65 +82,60 @@ const Tyres = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [tireData, setTireData] = useState<any[]>([]);
     const [filteredTireData, setFilteredTireData] = useState<any[]>([]);
+    const [inputValue, setInputValue] = useState('');
+    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
     const filterTireData = (rim_diameter: string, tire: string) => {
         console.log("Filtering tire data with rim diameter:", rim_diameter, "and tire:", tire);
 
-        // Asegurarse de que el formato de tire sea el correcto, por ejemplo "225/45ZR19"
-        const match = tire.match(/([A-Z])(\d{2})$/); // Extraer la construcción y el diámetro
+        // Asegurarse de que el formato de tire sea el correcto, por ejemplo "225/45ZR19" o "222/22/R22"
+        const match = tire.match(/^(\d{3})\/(\d{2})(\/R|[A-Z]*R)(\d{2})$/); // Modificación para capturar ambos formatos
 
         if (match) {
-            const tireParts = tire.split('/'); // Dividir por "/"
+            const width = Number(match[1]); // Extraer "225" o "222"
+            const aspect_ratio = Number(match[2]); // Extraer "45" o "22"
+            const diameter = match[4]; // Extraer "19" o "22"
 
-            // Asegurarse de que tenemos dos partes después de dividir
-            if (tireParts.length === 2) {
-                const width = Number(tireParts[0]); // Convertir a número "225"
-                const aspect_ratio = Number(tireParts[1].match(/^\d+/)?.[0]); // Convertir a número "45", solo los números antes de las letras
-                const diameter = match[2]; // "19"
+            console.log("NewDiameter:", diameter);
+            console.log("NewWidth:", width);
+            console.log("NewAspectRatio:", aspect_ratio);
 
-                console.log("NewDiameter:", diameter);
-                console.log("NewWidth:", width);
-                console.log("NewAspectRatio:", aspect_ratio);
-
-                if (isNaN(width) || isNaN(aspect_ratio)) {
-                    console.error("Invalid width or aspect ratio found.");
-                    return null;
-                }
-
-                // Definir las tolerancias
-                const tolerance = 1; // Tolerancia para el diámetro
-                const widthTolerance = 2; // Tolerancia para el ancho
-                const aspectRatioTolerance = 2; // Tolerancia para el aspecto
-
-                // Filtrar los datos de tireData usando width, aspect_ratio y diameter
-                const filtered = tireData.filter((data) => {
-                    const dataWidth = Number(data.width); // Asegurarse de que sea un número
-                    const dataAspectRatio = Number(data.aspect_ratio); // Asegurarse de que sea un número
-                    const dataDiameter = Number(data.diameter); // Asegurarse de que sea un número
-                    const diameterValue = Number(diameter); // Asegurarse de que sea un número
-
-                    // Comparar width, aspect_ratio y diameter con sus respectivas tolerancias
-                    return (
-                        dataWidth >= width - widthTolerance && dataWidth <= width + widthTolerance &&  // Comparar el ancho del neumático con tolerancia
-                        dataAspectRatio >= aspect_ratio - aspectRatioTolerance && dataAspectRatio <= aspect_ratio + aspectRatioTolerance && // Comparar el aspecto del neumático con tolerancia
-                        (dataDiameter >= diameterValue - tolerance && dataDiameter <= diameterValue + tolerance) // Comparar diámetro con tolerancia
-                    );
-                });
-
-                // Actualizar el estado de los datos filtrados
-                setFilteredTireData(filtered);
-
-                console.log("Filtered tire data:", filtered);
-                return filtered;
-            } else {
-                console.error("Invalid tire format. Expected format like '225/45ZR19'.");
+            if (isNaN(width) || isNaN(aspect_ratio)) {
+                console.error("Invalid width or aspect ratio found.");
                 return null;
             }
+
+            // Definir las tolerancias
+            const tolerance = 1; // Tolerancia para el diámetro
+            const widthTolerance = 2; // Tolerancia para el ancho
+            const aspectRatioTolerance = 2; // Tolerancia para el aspecto
+
+            // Filtrar los datos de tireData usando width, aspect_ratio y diameter
+            const filtered = tireData.filter((data) => {
+                const dataWidth = Number(data.width); // Asegurarse de que sea un número
+                const dataAspectRatio = Number(data.aspect_ratio); // Asegurarse de que sea un número
+                const dataDiameter = Number(data.diameter); // Asegurarse de que sea un número
+                const diameterValue = Number(diameter); // Asegurarse de que sea un número
+
+                // Comparar width, aspect_ratio y diameter con sus respectivas tolerancias
+                return (
+                    dataWidth >= width - widthTolerance && dataWidth <= width + widthTolerance &&  // Comparar el ancho del neumático con tolerancia
+                    dataAspectRatio >= aspect_ratio - aspectRatioTolerance && dataAspectRatio <= aspect_ratio + aspectRatioTolerance && // Comparar el aspecto del neumático con tolerancia
+                    (dataDiameter >= diameterValue - tolerance && dataDiameter <= diameterValue + tolerance) // Comparar diámetro con tolerancia
+                );
+            });
+
+            // Actualizar el estado de los datos filtrados
+            setFilteredTireData(filtered);
+
+            console.log("Filtered tire data:", filtered);
+            return filtered;
         } else {
-            console.error("No valid tire data found.");
+            console.error("Invalid tire format. Expected formats like '225/45ZR19' or '222/22/R22'.");
             return null;
         }
     };
+
 
 
 
@@ -215,6 +212,33 @@ const Tyres = () => {
         }));
     };
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value); // Actualiza el valor del input
+        // Verifica si el input está completamente llenado según la máscara
+        setIsButtonDisabled(!/^(\d{3})\/(\d{2})\/R(\d{2})$/.test(e.target.value));
+    };
+
+    const handleSearchClick = () => {
+        // Limpiar todos los params al buscar por input
+        setParams(prevParams => ({
+            ...prevParams,
+            make: '',
+            model: '',
+            year: '',
+            modification: '',
+            modification_name: '',
+            tire: '',
+            rim_diameter: '',
+            logo: ''
+        }));
+
+        const [width, aspectRatio, rimDiameter] = inputValue.split('/');
+        // Extraer solo el número del rimDiameter (quitar la 'R')
+        const cleanRimDiameter = rimDiameter.replace('R', '');
+        filterTireData(cleanRimDiameter, inputValue);
+    };
+
+
     return (
         <div className='flex flex-col w-full' >
             <div className="flex items-center justify-center text-6xl font-bold mb-5 text-[#FF6600] italic">
@@ -225,12 +249,20 @@ const Tyres = () => {
 
             <h1 className="text-2xl font-bold text-center text-[#B7B6B6] pt-4">¿Ya tienes tus medidas?</h1>
             <div className="flex justify-center mt-4">
-                <input
-                    type="text"
+                <InputMask
+                    mask="999/99/R99"
                     placeholder="Por ejemplo: 225/45/R17"
-                    className="border border-gray-300 rounded-md p-2 w-full max-w-md"
+                    className="border border-gray-300 rounded-l-full p-4 w-full max-w-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#FF6600] transition-all duration-300 placeholder-gray-400 text-lg"
+                    value={inputValue} // El valor del input es el valor del estado
+                    onChange={handleInputChange} // Se ejecuta cuando el usuario escribe
                 />
-                <button className="bg-[#FF6600] text-white font-semibold rounded-md p-2 ml-2">Buscar</button>
+                <button
+                    className={`bg-[#FF6600] text-white font-semibold rounded-md p-2 ml-2 ${isButtonDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onClick={handleSearchClick}
+                    disabled={isButtonDisabled} // Deshabilita el botón si el input no está completo
+                >
+                    Buscar
+                </button>
             </div>
             <h1 className="text-2xl font-bold text-center text-[#B7B6B6] pt-4 pb-4">o</h1>
 
@@ -317,9 +349,15 @@ const Tyres = () => {
                         <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg italic font-bold drop-shadow-lg flex items-center gap-2 mb-4' disabled>
                             {params.modification_name}
                         </button>
-                        <button className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg font-semibold drop-shadow-lg flex items-center gap-2 mb-4' onClick={() => setParams(prevParams => ({ ...prevParams, rim_diameter: '', tire: '' }))}>
+                        <button
+                            className='bg-[#F8F8FE] text-black text-xl py-2 px-4 rounded-lg font-semibold drop-shadow-lg flex items-center gap-2 mb-4'
+                            onClick={() => {
+                                setParams(prevParams => ({ ...prevParams, rim_diameter: '', tire: '' }));
+                                setFilteredTireData([]);
+                            }}
+                        >
                             <span className='text-4xl'>{params.rim_diameter}</span>
-                            <span className='mx-3 h-full self-stretch border-l-2 border-black' style={{ minHeight: '24px' }}></span> {/* Styling line separator */}
+                            <span className='mx-3 h-full self-stretch border-l-2 border-black' style={{ minHeight: '24px' }}></span>
                             <span className='text-lg'>{params.tire}</span>
                         </button>
                     </div>
@@ -337,7 +375,11 @@ const Tyres = () => {
 
     function renderContent() {
         if (data.length > 0) {
-            if (!params.make) {
+
+            if (filteredTireData.length > 0) {
+                return <Cards tireData={filteredTireData} />;
+            }
+            else if (!params.make) {
                 return (
                     <div className='overflow-y-auto max-h-[500px] w-full px-5'>
                         <div className='flex flex-wrap justify-center gap-5 mt-10'>
@@ -441,10 +483,11 @@ const Tyres = () => {
                 );
             }
             else if (params.make && params.model && params.year && params.modification && params.rim_diameter && params.tire) {
-                return renderCards();
+                return <Cards tireData={filteredTireData} />;
             }
-
-            // Puedes agregar más condiciones y renderizados aquí
+        } else if (filteredTireData.length > 0) {
+            // Si no hay datos de marcas pero sí hay datos filtrados, mostrar las Cards
+            return <Cards tireData={filteredTireData} />;
         } else {
             return <p>No data found</p>;
         }
@@ -482,12 +525,6 @@ const Tyres = () => {
                     </div>
                 </form>
             </div>
-        );
-    }
-
-    function renderCards() {
-        return (
-            <Cards rim_diameter={params.rim_diameter} tire={params.tire} tireData={filteredTireData} />
         );
     }
 }
