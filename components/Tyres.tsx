@@ -39,44 +39,6 @@ const Tyres = () => {
         user_key: process.env.NEXT_PUBLIC_API_KEY,
     });
 
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();  // Prevenir el comportamiento de envío predeterminado
-
-        const formData = {
-            firstName: event.currentTarget.firstName.value,
-            lastName: event.currentTarget.lastName.value,
-            email: event.currentTarget.email.value,
-            mobile: event.currentTarget.mobile.value,
-            comments: event.currentTarget.comments.value,
-            make: params.make,
-            model: params.model,
-            year: params.year,
-            modification: params.modification_name,
-            tire: params.tire,
-            rim_diameter: params.rim_diameter,
-        };
-
-        try {
-            const response = await fetch('/api/mail', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-
-            if (response.ok) {
-                console.log('Mensaje enviado correctamente');
-                alert('Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto.');
-            } else {
-                console.error('Error al enviar mensaje');
-                alert('Hubo un problema al enviar tu mensaje. Por favor, intenta nuevamente.');
-            }
-        } catch (error) {
-            console.error('Error de conexión:', error);
-            alert('Error de conexión al intentar enviar el mensaje.');
-        }
-    };
 
     const [data, setData] = useState<Vehicle[]>([]); // Usando el tipo Vehicle[]
     const [error, setError] = useState('');

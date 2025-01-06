@@ -1,6 +1,7 @@
 import React, { FormEvent } from 'react';
 import PriceDisplay from './PriceDisplay';
 import Image from 'next/image';
+import { Toaster, toast } from 'sonner';
 
 interface TireDetails {
     codigo: string;
@@ -45,9 +46,11 @@ const Form: React.FC<FormProps> = ({ selectedTires, onBackToCards }) => {
             });
 
             if (response.ok) {
-                alert('Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto.');
+                // alert('Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto.');
+                toast.success('Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto.');
             } else {
-                alert('Hubo un problema al enviar tu mensaje. Por favor, intenta nuevamente.');
+                // alert('Hubo un problema al enviar tu mensaje. Por favor, intenta nuevamente.');
+                toast.error('Hubo un problema al enviar tu mensaje. Por favor, intenta nuevamente.');
             }
         } catch (error) {
             console.error('Error de conexión:', error);
@@ -59,6 +62,7 @@ const Form: React.FC<FormProps> = ({ selectedTires, onBackToCards }) => {
 
     return (
         <div className="flex flex-col justify-center items-center w-full px-5 mt-5">
+            <Toaster position="bottom-right" richColors />
             <div className="w-full max-w-4xl bg-[#F8F8FE] rounded-lg p-6 mb-6">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold text-[#B7B6B6]">Resumen de tu orden</h2>
