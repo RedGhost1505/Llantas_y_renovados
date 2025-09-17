@@ -2,6 +2,7 @@
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore, { Autoplay, Pagination, Navigation } from 'swiper/core';
+import favicon from "../public/favicon1.png"
 
 // Importa estilos necesarios
 import 'swiper/swiper.min.css';

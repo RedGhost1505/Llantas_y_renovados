@@ -3,7 +3,22 @@ import { HomeProps } from "@types";
 import { fuels, yearsOfProduction } from "@constants";
 import { CarCard, ShowMore, SearchBar, CustomFilter, Hero, Carousel, Tyres, Slides } from "@components";
 
+
+async function getProducts() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`);
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch data');
+  }
+
+  const data = await res.json();
+  return data.productos;
+}
+
 export default async function Home({ searchParams }: HomeProps) {
+  const products = await getProducts();
+  console.log(products);
+
   const images = [
     { url: "/Slider-tiendas-2.jpg", alt: "image1", ub: "Sucursal Valsequillo", loc: "José María La Fragua No. 10537- Esq. 24 sur y Valsequillo\n Col. Rancho San José Xilotzingo, PUEBLA PUE." },
     { url: "/Slider-tiendas-2-1.jpg", alt: "image2", ub: "Sucursal Boulevard Chilpancingo", loc: "BLVD.Vicente Guerreo KM.271 COL. Cuauhtemoc Norte\n CHILPANCINGO DE LOS BRAVO GUERRERO" },
