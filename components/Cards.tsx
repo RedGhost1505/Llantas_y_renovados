@@ -2,19 +2,20 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Form from './Form';
 
+// Update the interface to match the API response (PascalCase)
 interface TireDetails {
-  codigo: string;
-  modelo: string;
-  marca: string;
-  may: number;
-  width: string;
-  aspect_ratio: string;
-  construction: string;
-  diameter: string;
-  rango_carga: string;
-  rango_velocidad: string;
-  uso: string;
-  fuente_imagen: string;
+  CODIGO: string;
+  Modelo: string;
+  Marca: string;
+  MAY: number; // Assuming MAY is the price property
+  Width: string;
+  Aspect_Ratio: string;
+  Construction: string;
+  Diameter: string;
+  Rango_Carga: string;
+  Rango_Velocidad: string;
+  USO: string;
+  Fuente_Imagen: string;
 }
 
 interface CardProps {
@@ -54,10 +55,10 @@ const Cards: React.FC<CardProps> = ({ tireData }) => {
 
   // Encontrar los detalles completos de las llantas seleccionadas
   const selectedTiresDetails = tireData.filter(tire =>
-    selectedItems[tire.codigo]
+    selectedItems[tire.CODIGO] // Use CODIGO
   ).map(tire => ({
     ...tire,
-    quantity: selectedItems[tire.codigo]
+    quantity: selectedItems[tire.CODIGO] // Use CODIGO
   }));
 
   if (showForm) {
@@ -93,12 +94,12 @@ const Cards: React.FC<CardProps> = ({ tireData }) => {
 
         <div className="flex flex-wrap justify-center gap-6">
           {tireData.map((tire) => (
-            <div key={tire.codigo} className="w-full sm:w-[320px]">
+            <div key={tire.CODIGO} className="w-full sm:w-[320px]"> {/* Use CODIGO */}
               <div className="bg-[#F8F8FE] drop-shadow-lg rounded-lg p-6 h-full flex flex-col">
                 <div className="flex justify-center mb-4">
                   <div className="w-[200px] h-[200px] relative overflow-hidden rounded-lg">
                     <Image
-                      src={tire.fuente_imagen}
+                      src={`/tires/${tire.Fuente_Imagen}`} // Use Fuente_Imagen and add path
                       alt="tyre"
                       fill
                       sizes="200px"
@@ -112,17 +113,17 @@ const Cards: React.FC<CardProps> = ({ tireData }) => {
 
                 <div className="flex-grow">
                   <p className="font-bold text-xl">
-                    {tire.modelo}
-                    <span className="font-normal text-sm"> - {tire.marca} </span>
+                    {tire.Modelo} {/* Use Modelo */}
+                    <span className="font-normal text-sm"> - {tire.Marca} </span> {/* Use Marca */}
                   </p>
 
                   <p className="mt-1">
-                    {(tire.width || "-")}/{(tire.aspect_ratio || "-")}/{(tire.construction || "-")}{(tire.diameter || "-")} - {(tire.rango_carga || "-")}{(tire.rango_velocidad || "-")}
+                    {(tire.Width || "-")}/{(tire.Aspect_Ratio || "-")}/{(tire.Construction || "-")}{(tire.Diameter || "-")} - {(tire.Rango_Carga || "-")}{(tire.Rango_Velocidad || "-")}
                   </p>
 
                   <div className="grid grid-cols-2 gap-2 mt-4">
-                    <p className="col-span-1"><strong>Modelo:</strong> {tire.modelo}</p>
-                    <p className="col-span-1"><strong>Uso:</strong> {tire.uso}</p>
+                    <p className="col-span-1"><strong>Modelo:</strong> {tire.Modelo}</p> {/* Use Modelo */}
+                    <p className="col-span-1"><strong>Uso:</strong> {tire.USO}</p> {/* Use USO */}
                     <p className="col-span-1 text-green-500 flex items-center">
                       <span className="inline-block w-3 h-3 bg-green-500 rounded-full mr-2"></span>
                       <strong>Disponible</strong>
@@ -131,21 +132,21 @@ const Cards: React.FC<CardProps> = ({ tireData }) => {
                 </div>
 
                 <div className="mt-4 flex flex-row justify-between items-center">
-                  <p className="font-bold text-xl text-red-500">MX ${tire.may}</p>
+                  <p className="font-bold text-xl text-red-500">MX ${tire.MAY}</p> {/* Use MAY */}
 
-                  {selectedItems[tire.codigo] ? (
+                  {selectedItems[tire.CODIGO] ? ( // Use CODIGO
                     <div className="flex flex-col items-center">
                       <div className="flex items-center">
                         <button
                           className="bg-gray-300 text-black font-bold py-1 px-3 rounded-l-full hover:bg-gray-400 transition duration-300"
-                          onClick={() => handleDecrease(tire.codigo)}
+                          onClick={() => handleDecrease(tire.CODIGO)} // Use CODIGO
                         >
                           -
                         </button>
-                        <span className="px-4">{selectedItems[tire.codigo]}</span>
+                        <span className="px-4">{selectedItems[tire.CODIGO]}</span> {/* Use CODIGO */}
                         <button
                           className="bg-gray-300 text-black font-bold py-1 px-3 rounded-r-full hover:bg-gray-400 transition duration-300"
-                          onClick={() => handleIncrease(tire.codigo)}
+                          onClick={() => handleIncrease(tire.CODIGO)} // Use CODIGO
                         >
                           +
                         </button>
@@ -154,7 +155,7 @@ const Cards: React.FC<CardProps> = ({ tireData }) => {
                   ) : (
                     <button
                       className="bg-orange-500 text-white font-bold py-2 px-4 rounded-full hover:bg-orange-600 transition duration-300"
-                      onClick={() => handleAddClick(tire.codigo)}
+                      onClick={() => handleAddClick(tire.CODIGO)} // Use CODIGO
                     >
                       Añadir
                     </button>

@@ -3,23 +3,19 @@ import PriceDisplay from './PriceDisplay';
 import Image from 'next/image';
 import { Toaster, toast } from 'sonner';
 
-interface TireDetails {
-    codigo: string;
-    modelo: string;
-    marca: string;
-    may: number;
-    width: string;
-    aspect_ratio: string;
-    construction: string;
-    diameter: string;
-    rango_carga: string;
-    rango_velocidad: string;
-    uso: string;
-    fuente_imagen: string;
+// Define an interface for a single selected tire that matches the data from Cards.tsx
+interface SelectedTire {
+    CODIGO: string;
+    Modelo: string;
+    Marca: string;
+    MAY: number;
+    quantity: number; // Add the quantity property
+    [key: string]: any; // Allow other properties
 }
 
+// Define the props for the Form component
 interface FormProps {
-    selectedTires: (TireDetails & { quantity: number })[];
+    selectedTires: SelectedTire[]; // Use the new SelectedTire interface
     onBackToCards: () => void;
 }
 
@@ -58,7 +54,7 @@ const Form: React.FC<FormProps> = ({ selectedTires, onBackToCards }) => {
         }
     };
 
-    const totalAmount = selectedTires.reduce((sum, tire) => sum + (tire.may * tire.quantity), 0);
+    const totalAmount = selectedTires.reduce((sum, tire) => sum + (tire.MAY * tire.quantity), 0);
 
     return (
         <div className="flex flex-col justify-center items-center w-full px-5 mt-5">
@@ -76,10 +72,10 @@ const Form: React.FC<FormProps> = ({ selectedTires, onBackToCards }) => {
 
                 <div className="space-y-4 mb-6">
                     {selectedTires.map((tire) => (
-                        <div key={tire.codigo} className="flex items-center justify-between p-4 bg-white rounded-lg">
+                        <div key={tire.CODIGO} className="flex items-center justify-between p-4 bg-white rounded-lg">
                             <div className="flex items-center space-x-4">
                                 <div>
-                                    <p className="font-bold">{tire.modelo} - {tire.marca}</p>
+                                    <p className="font-bold">{tire.Modelo} - {tire.Marca}</p>
                                     <p className="text-sm text-gray-600">
                                         {tire.width}/{tire.aspect_ratio}/{tire.construction}{tire.diameter}
                                     </p>
@@ -87,7 +83,7 @@ const Form: React.FC<FormProps> = ({ selectedTires, onBackToCards }) => {
                                 </div>
                             </div>
                             <p className="font-bold">
-                                <PriceDisplay amount={tire.may * tire.quantity} />
+                                <PriceDisplay amount={tire.MAY * tire.quantity} />
                             </p>
                         </div>
                     ))}
