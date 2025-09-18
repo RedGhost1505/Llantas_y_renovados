@@ -75,9 +75,9 @@ const Tyres = () => {
 
             // Filtrar los datos de tireData usando width, aspect_ratio y diameter
             const filtered = tireData.filter((data) => {
-                const dataWidth = Number(data.width); // Asegurarse de que sea un número
-                const dataAspectRatio = Number(data.aspect_ratio); // Asegurarse de que sea un número
-                const dataDiameter = Number(data.diameter); // Asegurarse de que sea un número
+                const dataWidth = Number(data.Width); // Asegurarse de que sea un número
+                const dataAspectRatio = Number(data.AspectRatio); // Asegurarse de que sea un número
+                const dataDiameter = Number(data.Diameter); // Asegurarse de que sea un número
                 const diameterValue = Number(diameter); // Asegurarse de que sea un número
 
                 // Comparar width, aspect_ratio y diameter con sus respectivas tolerancias
@@ -152,10 +152,10 @@ const Tyres = () => {
     useEffect(() => {
         const fetchTireData = async () => {
             try {
-                const response = await fetch('/api/db'); // Replace with your API endpoint
+                const response = await fetch('/api/products'); // 1. Use the new API endpoint
                 const data = await response.json();
-                console.log("Data", data);
-                setTireData(data);
+                console.log("Data from /api/products", data.productos);
+                setTireData(data.productos); // 2. Access the 'productos' array
             } catch (err) {
                 console.error('Error fetching data:', err);
                 setError('Failed to load data');
