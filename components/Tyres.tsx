@@ -51,13 +51,19 @@ const Tyres = () => {
     const filterTireData = (rim_diameter: string, tire: string) => {
         console.log("Filtering tire data with rim diameter:", rim_diameter, "and tire:", tire);
 
-        // Asegurarse de que el formato de tire sea el correcto, por ejemplo "225/45ZR19" o "222/22/R22"
-        const match = tire.match(/^(\d{3})\/(\d{2})(\/R|[A-Z]*R)(\d{2})$/); // Modificación para capturar ambos formatos
+        // Regex updated to correctly parse formats like "245/35ZR20"
+        const match = tire.match(/^(\d{3})\/(\d{2})[A-Z]*R?(\d{2,3})$/);
 
         if (match) {
-            const width = Number(match[1]); // Extraer "225" o "222"
-            const aspect_ratio = Number(match[2]); // Extraer "45" o "22"
-            const diameter = match[4]; // Extraer "19" o "22"
+            const width = Number(match[1]);
+            const aspect_ratio = Number(match[2]);
+            const diameter = match[3]; // Diameter is now the 3rd capture group
+
+            // --- CONVERSION LOGIC ---
+            // Convert search width from millimeters to inches (1 inch = 25.4 mm)
+            const searchWidthInches = width / 25.4;
+            console.log(`CONVERTED: Search Width ${width}mm is approx. ${searchWidthInches.toFixed(2)} inches`);
+            // --- END CONVERSION ---
 
             console.log("NewDiameter:", diameter);
             console.log("NewWidth:", width);
@@ -75,15 +81,21 @@ const Tyres = () => {
 
             // Filtrar los datos de tireData usando width, aspect_ratio y diameter
             const filtered = tireData.filter((data) => {
-                const dataWidth = Number(data.Width); // Asegurarse de que sea un número
-                const dataAspectRatio = Number(data.AspectRatio); // Asegurarse de que sea un número
-                const dataDiameter = Number(data.Diameter); // Asegurarse de que sea un número
-                const diameterValue = Number(diameter); // Asegurarse de que sea un número
+                const dataWidth = Number(data.Width);
+                const dataAspectRatio = Number(data.AspectRatio);
+                // Replace comma with a period for correct number conversion
+                const dataDiameter = Number(String(data.Diameter).replace(',', '.'));
+                const diameterValue = Number(diameter);
+
+                // Check if AspectRatio exists in the database. If not, we can't reliably filter by it.
+                const hasAspectRatio = data.AspectRatio && data.AspectRatio !== "";
 
                 // Comparar width, aspect_ratio y diameter con sus respectivas tolerancias
                 return (
-                    dataWidth >= width - widthTolerance && dataWidth <= width + widthTolerance &&  // Comparar el ancho del neumático con tolerancia
-                    dataAspectRatio >= aspect_ratio - aspectRatioTolerance && dataAspectRatio <= aspect_ratio + aspectRatioTolerance && // Comparar el aspecto del neumático con tolerancia
+                    // Compare the CONVERTED search width (in inches) to the database width (in inches)
+                    dataWidth >= searchWidthInches - widthTolerance && dataWidth <= searchWidthInches + widthTolerance &&
+                    // Only check aspect ratio if the database has a value for it
+                    (!hasAspectRatio || (dataAspectRatio >= aspect_ratio - aspectRatioTolerance && dataAspectRatio <= aspect_ratio + aspectRatioTolerance)) &&
                     (dataDiameter >= diameterValue - tolerance && dataDiameter <= diameterValue + tolerance) // Comparar diámetro con tolerancia
                 );
             });
@@ -94,7 +106,7 @@ const Tyres = () => {
             console.log("Filtered tire data:", filtered);
             return filtered;
         } else {
-            console.error("Invalid tire format. Expected formats like '225/45ZR19' or '222/22/R22'.");
+            console.error("Invalid tire format. Received:", tire);
             return null;
         }
     };
