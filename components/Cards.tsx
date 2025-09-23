@@ -113,26 +113,23 @@ const Cards: React.FC<CardProps> = ({ tireData }) => {
 
                 <div className="flex-grow">
                   <p className="font-bold text-xl">
-                    {tire.Modelo} {/* Use Modelo */}
-                    <span className="font-normal text-sm"> - {tire.Marca} </span> {/* Use Marca */}
+                    {tire.Modelo}
                   </p>
 
-                  <p className="mt-1">
-                    {(tire.Width || "-")}/{(tire.Aspect_Ratio || "-")}/{(tire.Construction || "-")}{(tire.Diameter || "-")} - {(tire.Rango_Carga || "-")}{(tire.Rango_Velocidad || "-")}
+                  {/* Corrected tire size display format */}
+                  <p className="mt-1 text-lg">
+                    <span className="font-bold">{String(tire.Diameter).replace(',', '.')}</span>
+                    <span className="mx-2">|</span>
+                    <span>{tire.Width || "-"}{tire.Aspect_Ratio ? `/${tire.Aspect_Ratio}` : ''}{tire.Construction || ""}{String(tire.Diameter).replace(',', '.')}</span>
                   </p>
 
                   <div className="grid grid-cols-2 gap-2 mt-4">
-                    <p className="col-span-1"><strong>Modelo:</strong> {tire.Modelo}</p> {/* Use Modelo */}
-                    <p className="col-span-1"><strong>Uso:</strong> {tire.USO}</p> {/* Use USO */}
-                    <p className="col-span-1 text-green-500 flex items-center">
-                      <span className="inline-block w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                      <strong>Disponible</strong>
-                    </p>
+                    <p className="col-span-1"><strong>Marca:</strong> {tire.Marca}</p>
+                    <p className="col-span-1"><strong>Uso:</strong> {tire.USO}</p>
                   </div>
                 </div>
 
                 <div className="mt-4 flex flex-row justify-between items-center">
-                  <p className="font-bold text-xl text-red-500">MX ${tire.MAY}</p> {/* Use MAY */}
 
                   {selectedItems[tire.CODIGO] ? ( // Use CODIGO
                     <div className="flex flex-col items-center">

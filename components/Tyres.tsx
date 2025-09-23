@@ -49,64 +49,40 @@ const Tyres = () => {
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
     const filterTireData = (rim_diameter: string, tire: string) => {
-        console.log("Filtering tire data with rim diameter:", rim_diameter, "and tire:", tire);
+        console.log("Filtering with (mm):", tire);
 
-        // Regex updated to correctly parse formats like "245/35ZR20"
         const match = tire.match(/^(\d{3})\/(\d{2})[A-Z]*R?(\d{2,3})$/);
 
         if (match) {
-            const width = Number(match[1]);
-            const aspect_ratio = Number(match[2]);
-            const diameter = match[3]; // Diameter is now the 3rd capture group
+            const searchWidth = Number(match[1]);
+            const searchAspectRatio = Number(match[2]);
+            const searchDiameter = Number(match[3]);
 
-            // --- CONVERSION LOGIC ---
-            // Convert search width from millimeters to inches (1 inch = 25.4 mm)
-            const searchWidthInches = width / 25.4;
-            console.log(`CONVERTED: Search Width ${width}mm is approx. ${searchWidthInches.toFixed(2)} inches`);
-            // --- END CONVERSION ---
+            const widthTolerance = 10; // Allow +/- 10mm for width
+            const aspectRatioTolerance = 5; // Allow +/- 5 for aspect ratio
+            const diameterTolerance = 0.5; // Allow +/- 0.5 for diameter
 
-            console.log("NewDiameter:", diameter);
-            console.log("NewWidth:", width);
-            console.log("NewAspectRatio:", aspect_ratio);
-
-            if (isNaN(width) || isNaN(aspect_ratio)) {
-                console.error("Invalid width or aspect ratio found.");
-                return null;
-            }
-
-            // Definir las tolerancias
-            const tolerance = 1; // Tolerancia para el diámetro
-            const widthTolerance = 2; // Tolerancia para el ancho
-            const aspectRatioTolerance = 2; // Tolerancia para el aspecto
-
-            // Filtrar los datos de tireData usando width, aspect_ratio y diameter
             const filtered = tireData.filter((data) => {
+                // Normalize database width to millimeters for a consistent comparison
                 const dataWidth = Number(data.Width);
+                const dbWidthInMm = dataWidth < 30 ? dataWidth * 25.4 : dataWidth;
+
                 const dataAspectRatio = Number(data.AspectRatio);
-                // Replace comma with a period for correct number conversion
                 const dataDiameter = Number(String(data.Diameter).replace(',', '.'));
-                const diameterValue = Number(diameter);
 
-                // Check if AspectRatio exists in the database. If not, we can't reliably filter by it.
-                const hasAspectRatio = data.AspectRatio && data.AspectRatio !== "";
+                // Compare all values
+                const isWidthMatch = Math.abs(dbWidthInMm - searchWidth) <= widthTolerance;
+                const isAspectRatioMatch = !data.Aspect_Ratio || Math.abs(dataAspectRatio - searchAspectRatio) <= aspectRatioTolerance;
+                const isDiameterMatch = Math.abs(dataDiameter - searchDiameter) <= diameterTolerance;
 
-                // Comparar width, aspect_ratio y diameter con sus respectivas tolerancias
-                return (
-                    // Compare the CONVERTED search width (in inches) to the database width (in inches)
-                    dataWidth >= searchWidthInches - widthTolerance && dataWidth <= searchWidthInches + widthTolerance &&
-                    // Only check aspect ratio if the database has a value for it
-                    (!hasAspectRatio || (dataAspectRatio >= aspect_ratio - aspectRatioTolerance && dataAspectRatio <= aspect_ratio + aspectRatioTolerance)) &&
-                    (dataDiameter >= diameterValue - tolerance && dataDiameter <= diameterValue + tolerance) // Comparar diámetro con tolerancia
-                );
+                return isWidthMatch && isAspectRatioMatch && isDiameterMatch;
             });
 
-            // Actualizar el estado de los datos filtrados
             setFilteredTireData(filtered);
-
-            console.log("Filtered tire data:", filtered);
+            console.log("Filtered Results:", filtered);
             return filtered;
         } else {
-            console.error("Invalid tire format. Received:", tire);
+            console.error("Invalid tire format for filtering. Received:", tire);
             return null;
         }
     };
