@@ -51,16 +51,16 @@ const Tyres = () => {
     const filterTireData = (rim_diameter: string, tire: string) => {
         console.log("Filtering with (mm):", tire);
 
-        const match = tire.match(/^(\d{3})\/(\d{2})[A-Z]*R?(\d{2,3})$/);
+        const match = tire.match(/^(\d{3})\/(\d{2})[A-Z]*R(\d{2,3}(?:[.,]\d)?)$/);
 
         if (match) {
             const searchWidth = Number(match[1]);
             const searchAspectRatio = Number(match[2]);
-            const searchDiameter = Number(match[3]);
+            const searchDiameter = Number(String(match[3]).replace(',', '.'));
 
             const widthTolerance = 10; // Allow +/- 10mm for width
             const aspectRatioTolerance = 5; // Allow +/- 5 for aspect ratio
-            const diameterTolerance = 0.5; // Allow +/- 0.5 for diameter
+            const diameterTolerance = 0.5; // Allow +/- 0.5 inch for diameter
 
             const filtered = tireData.filter((data) => {
                 // Normalize database width to millimeters for a consistent comparison
@@ -75,7 +75,7 @@ const Tyres = () => {
                 const isAspectRatioMatch = !data.Aspect_Ratio || Math.abs(dataAspectRatio - searchAspectRatio) <= aspectRatioTolerance;
                 const isDiameterMatch = Math.abs(dataDiameter - searchDiameter) <= diameterTolerance;
 
-                return isWidthMatch && isAspectRatioMatch && isDiameterMatch;
+                return isDiameterMatch;
             });
 
             setFilteredTireData(filtered);
