@@ -113,7 +113,10 @@ const Cards: React.FC<CardProps> = ({ tireData }) => {
 
                 <div className="flex-grow">
                   <p className="font-bold text-xl">
-                    {tire.Modelo}<span className="text-sm font-light"> - {String(tire.Diameter).replace(',', '.')} | {tire.Width || "-"}{tire.Aspect_Ratio ? `/${tire.Aspect_Ratio}` : 'N/A'}{tire.Construction || ""}{String(tire.Diameter).replace(',', '.')} </span>
+                    {tire.Modelo}
+                  </p>
+                  <p className="text-sm font-light">
+                    {tire.Width || "-"}{tire.Aspect_Ratio ? `/${tire.Aspect_Ratio}` : ''}{tire.Construction || ""}{String(tire.Diameter).replace(',', '.')}
                   </p>
 
                   <div className="grid grid-cols-2 gap-2 mt-4">
