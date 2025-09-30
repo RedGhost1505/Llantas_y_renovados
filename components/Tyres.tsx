@@ -47,44 +47,62 @@ const Tyres = () => {
     const [filteredTireData, setFilteredTireData] = useState<any[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+    const [unit, setUnit] = useState('mm'); // 'mm' or 'in'
 
     const filterTireData = (rim_diameter: string, tire: string) => {
-        console.log("Filtering with (mm):", tire);
+        console.log(`Filtering with (${unit}):`, tire);
 
-        const match = tire.match(/^(\d{3})\/(\d{2})[A-Z]*R(\d{2,3}(?:[.,]\d)?)$/);
+        let searchWidth: number, searchAspectRatio: number | null, searchDiameter: number;
 
-        if (match) {
-            const searchWidth = Number(match[1]);
-            const searchAspectRatio = Number(match[2]);
-            const searchDiameter = Number(String(match[3]).replace(',', '.'));
+        if (unit === 'mm') {
+            const match = tire.match(/^(\d{3})\/(\d{2})[A-Z]*R(\d{2,3}(?:[.,]\d)?)$/);
+            if (!match) {
+                console.error("Invalid metric tire format for filtering. Received:", tire);
+                return null;
+            }
+            searchWidth = Number(match[1]);
+            searchAspectRatio = Number(match[2]);
+            searchDiameter = Number(String(match[3]).replace(',', '.'));
+        } else { // unit === 'in'
+            // Example: 31x10.50R15
+            const match = tire.match(/^(\d{2}(?:[.,]\d)?)[xX](\d{2}(?:[.,]\d)?)[A-Z]*R(\d{2,3}(?:[.,]\d)?)$/);
+            if (!match) {
+                console.error("Invalid imperial tire format for filtering. Received:", tire);
+                return null;
+            }
+            // In imperial, the first number is overall diameter, second is width.
+            // This is a simplification. We'll use width for filtering.
+            searchWidth = Number(String(match[2]).replace(',', '.')) * 25.4; // Convert width to mm
+            searchAspectRatio = null; // Imperial sizes often don't have aspect ratio.
+            searchDiameter = Number(String(match[3]).replace(',', '.'));
+        }
 
-            const widthTolerance = 10; // Allow +/- 10mm for width
-            const aspectRatioTolerance = 5; // Allow +/- 5 for aspect ratio
-            const diameterTolerance = 0.5; // Allow +/- 0.5 inch for diameter
+        const widthTolerance = 10; // Allow +/- 10mm for width
+        const aspectRatioTolerance = 5; // Allow +/- 5 for aspect ratio
+        const diameterTolerance = 0.5; // Allow +/- 0.5 inch for diameter
 
-            const filtered = tireData.filter((data) => {
-                // Normalize database width to millimeters for a consistent comparison
-                const dataWidth = Number(data.Width);
-                const dbWidthInMm = dataWidth < 30 ? dataWidth * 25.4 : dataWidth;
+        const filtered = tireData.filter((data) => {
+            const dataWidth = Number(data.Width);
+            const dbWidthInMm = dataWidth < 30 ? dataWidth * 25.4 : dataWidth;
 
-                const dataAspectRatio = Number(data.AspectRatio);
-                const dataDiameter = Number(String(data.Diameter).replace(',', '.'));
+            const dataAspectRatio = Number(data.AspectRatio);
+            const dataDiameter = Number(String(data.Diameter).replace(',', '.'));
 
-                // Compare all values
+            const isDiameterMatch = Math.abs(dataDiameter - searchDiameter) <= diameterTolerance;
+
+            if (unit === 'mm' && searchAspectRatio) {
                 const isWidthMatch = Math.abs(dbWidthInMm - searchWidth) <= widthTolerance;
                 const isAspectRatioMatch = !data.Aspect_Ratio || Math.abs(dataAspectRatio - searchAspectRatio) <= aspectRatioTolerance;
-                const isDiameterMatch = Math.abs(dataDiameter - searchDiameter) <= diameterTolerance;
+                return isWidthMatch && isAspectRatioMatch && isDiameterMatch;
+            } else { // For 'in', we have a rougher comparison
+                const isWidthMatch = Math.abs(dbWidthInMm - searchWidth) <= widthTolerance * 1.5; // Looser tolerance for inches
+                return isDiameterMatch && isWidthMatch;
+            }
+        });
 
-                return isDiameterMatch;
-            });
-
-            setFilteredTireData(filtered);
-            console.log("Filtered Results:", filtered);
-            return filtered;
-        } else {
-            console.error("Invalid tire format for filtering. Received:", tire);
-            return null;
-        }
+        setFilteredTireData(filtered);
+        console.log("Filtered Results:", filtered);
+        return filtered;
     };
 
 
@@ -169,9 +187,16 @@ const Tyres = () => {
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(e.target.value); // Actualiza el valor del input
-        // Verifica si el input está completamente llenado según la máscara
-        setIsButtonDisabled(!/^(\d{3})\/(\d{2})\/R(\d{2})$/.test(e.target.value));
+        const value = e.target.value;
+        setInputValue(value);
+
+        let isComplete = false;
+        if (unit === 'mm') {
+            isComplete = /^(\d{3})\/(\d{2})\/R(\d{2})$/.test(value);
+        } else { // unit === 'in'
+            isComplete = /^(\d{2}(?:[.,]\d)?)[xX](\d{2}(?:[.,]\d)?)[A-Z]*R(\d{2})$/.test(value);
+        }
+        setIsButtonDisabled(!isComplete);
     };
 
     const handleSearchClick = () => {
@@ -188,8 +213,8 @@ const Tyres = () => {
             logo: ''
         }));
 
-        const [width, aspectRatio, rimDiameter] = inputValue.split('/');
-        const cleanRimDiameter = rimDiameter.replace('R', '');
+        const rimDiameterMatch = inputValue.match(/R(\d{2,3}(?:[.,]\d)?)$/);
+        const cleanRimDiameter = rimDiameterMatch ? rimDiameterMatch[1] : '';
         const results = filterTireData(cleanRimDiameter, inputValue);
 
         // Mostrar toast si no hay resultados
@@ -198,6 +223,15 @@ const Tyres = () => {
                 description: 'Por favor, intenta con otras medidas o usa el buscador por vehículo.',
             });
         }
+    };
+
+    const handleUnitToggle = () => {
+        setUnit(prevUnit => {
+            const newUnit = prevUnit === 'mm' ? 'in' : 'mm';
+            setInputValue(''); // Clear input when toggling
+            setIsButtonDisabled(true); // Disable button
+            return newUnit;
+        });
     };
 
 
@@ -213,14 +247,20 @@ const Tyres = () => {
             <h1 className="text-2xl font-bold text-center text-[#B7B6B6] pt-4">¿Ya tienes tus medidas?</h1>
             <div className="flex justify-center mt-4">
                 <InputMask
-                    mask="999/99/R99"
-                    placeholder="Por ejemplo: 225/45/R17"
-                    className="border border-gray-300 rounded-l-full p-4 w-full max-w-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#FF6600] transition-all duration-300 placeholder-gray-400 text-lg"
+                    mask={unit === 'mm' ? "999/99/R99" : "99x99.99R99"}
+                    placeholder={unit === 'mm' ? "Por ejemplo: 225/45/R17" : "Por ejemplo: 31x10.50R15"}
+                    className="border-t border-b border-l border-gray-300 rounded-l-full p-4 w-full max-w-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#FF6600] transition-all duration-300 placeholder-gray-400 text-lg"
                     value={inputValue} // El valor del input es el valor del estado
                     onChange={handleInputChange} // Se ejecuta cuando el usuario escribe
                 />
                 <button
-                    className={`bg-[#FF6600] text-white font-semibold rounded-md p-2 ml-2 ${isButtonDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onClick={handleUnitToggle}
+                    className="bg-gray-200 text-gray-700 font-semibold p-4 border-t border-b border-gray-300 hover:bg-gray-300 transition-colors"
+                >
+                    {unit.toUpperCase()}
+                </button>
+                <button
+                    className={`bg-[#FF6600] text-white font-semibold rounded-r-full p-4 ${isButtonDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                     onClick={handleSearchClick}
                     disabled={isButtonDisabled} // Deshabilita el botón si el input no está completo
                 >
