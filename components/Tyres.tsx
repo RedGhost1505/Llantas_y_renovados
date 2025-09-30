@@ -49,12 +49,14 @@ const Tyres = () => {
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [unit, setUnit] = useState('mm'); // 'mm' or 'in'
 
-    const filterTireData = (rim_diameter: string, tire: string) => {
-        console.log(`Filtering with (${unit}):`, tire);
+    const filterTireData = (rim_diameter: string, tire?: string) => {
+        console.log(`Filtering with (${unit}):`, tire || rim_diameter);
 
-        let searchWidth: number, searchAspectRatio: number | null, searchDiameter: number;
+        let searchDiameter: number;
+        let searchWidth: number | null = null;
+        let searchAspectRatio: number | null = null;
 
-        if (unit === 'mm') {
+        if (unit === 'mm' && tire) {
             const match = tire.match(/^(\d{3})\/(\d{2})[A-Z]*R(\d{2,3}(?:[.,]\d)?)$/);
             if (!match) {
                 console.error("Invalid metric tire format for filtering. Received:", tire);
@@ -64,40 +66,44 @@ const Tyres = () => {
             searchAspectRatio = Number(match[2]);
             searchDiameter = Number(String(match[3]).replace(',', '.'));
         } else { // unit === 'in'
-            // Example: 31x10.50R15
-            const match = tire.match(/^(\d{2}(?:[.,]\d)?)[xX](\d{2}(?:[.,]\d)?)[A-Z]*R(\d{2,3}(?:[.,]\d)?)$/);
-            if (!match) {
-                console.error("Invalid imperial tire format for filtering. Received:", tire);
-                return null;
+            if (tire) { // Full imperial format e.g., 31x10.50R15
+                const match = tire.match(/^(\d{2}(?:[.,]\d)?)[xX](\d{2}(?:[.,]\d)?)[A-Z]*R(\d{2,3}(?:[.,]\d)?)$/);
+                if (!match) {
+                    console.error("Invalid imperial tire format for filtering. Received:", tire);
+                    searchDiameter = Number(String(rim_diameter).replace(',', '.'));
+                } else {
+                    searchWidth = Number(String(match[2]).replace(',', '.')) * 25.4; // Convert width to mm
+                    searchAspectRatio = null;
+                    searchDiameter = Number(String(match[3]).replace(',', '.'));
+                }
+            } else { // Only diameter
+                searchDiameter = Number(String(rim_diameter).replace(',', '.'));
             }
-            // In imperial, the first number is overall diameter, second is width.
-            // This is a simplification. We'll use width for filtering.
-            searchWidth = Number(String(match[2]).replace(',', '.')) * 25.4; // Convert width to mm
-            searchAspectRatio = null; // Imperial sizes often don't have aspect ratio.
-            searchDiameter = Number(String(match[3]).replace(',', '.'));
         }
 
-        const widthTolerance = 10; // Allow +/- 10mm for width
-        const aspectRatioTolerance = 5; // Allow +/- 5 for aspect ratio
         const diameterTolerance = 0.5; // Allow +/- 0.5 inch for diameter
 
         const filtered = tireData.filter((data) => {
-            const dataWidth = Number(data.Width);
-            const dbWidthInMm = dataWidth < 30 ? dataWidth * 25.4 : dataWidth;
-
-            const dataAspectRatio = Number(data.AspectRatio);
             const dataDiameter = Number(String(data.Diameter).replace(',', '.'));
-
             const isDiameterMatch = Math.abs(dataDiameter - searchDiameter) <= diameterTolerance;
 
-            if (unit === 'mm' && searchAspectRatio) {
+            if (unit === 'mm' && searchWidth && searchAspectRatio) {
+                const widthTolerance = 10; // Allow +/- 10mm for width
+                const aspectRatioTolerance = 5; // Allow +/- 5 for aspect ratio
+                const dataWidth = Number(data.Width);
+                const dbWidthInMm = dataWidth < 30 ? dataWidth * 25.4 : dataWidth;
+                const dataAspectRatio = Number(data.AspectRatio);
                 const isWidthMatch = Math.abs(dbWidthInMm - searchWidth) <= widthTolerance;
                 const isAspectRatioMatch = !data.Aspect_Ratio || Math.abs(dataAspectRatio - searchAspectRatio) <= aspectRatioTolerance;
-                return isWidthMatch && isAspectRatioMatch && isDiameterMatch;
-            } else { // For 'in', we have a rougher comparison
+                return isDiameterMatch;
+            } else if (unit === 'in' && searchWidth) {
+                const widthTolerance = 10;
+                const dataWidth = Number(data.Width);
+                const dbWidthInMm = dataWidth < 30 ? dataWidth * 25.4 : dataWidth;
                 const isWidthMatch = Math.abs(dbWidthInMm - searchWidth) <= widthTolerance * 1.5; // Looser tolerance for inches
                 return isDiameterMatch && isWidthMatch;
             }
+            return isDiameterMatch;
         });
 
         setFilteredTireData(filtered);
@@ -194,7 +200,7 @@ const Tyres = () => {
         if (unit === 'mm') {
             isComplete = /^(\d{3})\/(\d{2})\/R(\d{2})$/.test(value);
         } else { // unit === 'in'
-            isComplete = /^(\d{2}(?:[.,]\d)?)[xX](\d{2}(?:[.,]\d)?)[A-Z]*R(\d{2})$/.test(value);
+            isComplete = value.trim() !== '';
         }
         setIsButtonDisabled(!isComplete);
     };
@@ -247,8 +253,8 @@ const Tyres = () => {
             <h1 className="text-2xl font-bold text-center text-[#B7B6B6] pt-4">¿Ya tienes tus medidas?</h1>
             <div className="flex justify-center mt-4">
                 <InputMask
-                    mask={unit === 'mm' ? "999/99/R99" : "99x99.99R99"}
-                    placeholder={unit === 'mm' ? "Por ejemplo: 225/45/R17" : "Por ejemplo: 31x10.50R15"}
+                    mask={unit === 'mm' ? "999/99/R99" : "R99"}
+                    placeholder={unit === 'mm' ? "Por ejemplo: 225/45/R17" : "Por ejemplo: R15"}
                     className="border-t border-b border-l border-gray-300 rounded-l-full p-4 w-full max-w-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#FF6600] transition-all duration-300 placeholder-gray-400 text-lg"
                     value={inputValue} // El valor del input es el valor del estado
                     onChange={handleInputChange} // Se ejecuta cuando el usuario escribe
