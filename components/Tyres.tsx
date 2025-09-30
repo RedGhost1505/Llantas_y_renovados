@@ -45,9 +45,10 @@ const Tyres = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [tireData, setTireData] = useState<any[]>([]);
     const [filteredTireData, setFilteredTireData] = useState<any[]>([]);
-    const [inputValue, setInputValue] = useState('');
+    const [diameter, setDiameter] = useState('');
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [unit, setUnit] = useState('mm'); // 'mm' or 'in'
+    const [inputValue, setInputValue] = useState('');
 
     const filterTireData = (rim_diameter: string, tire?: string) => {
         console.log(`Filtering with (${unit}):`, tire || rim_diameter);
@@ -57,7 +58,7 @@ const Tyres = () => {
         let searchAspectRatio: number | null = null;
 
         if (unit === 'mm' && tire) {
-            const match = tire.match(/^(\d{3})\/(\d{2})[A-Z]*R(\d{2,3}(?:[.,]\d)?)$/);
+            const match = tire.match(/^(\d{3})\/(\d{2})\/?[A-Z]*R(\d{2,3}(?:[.,]\d)?)$/);
             if (!match) {
                 console.error("Invalid metric tire format for filtering. Received:", tire);
                 return null;
@@ -66,19 +67,7 @@ const Tyres = () => {
             searchAspectRatio = Number(match[2]);
             searchDiameter = Number(String(match[3]).replace(',', '.'));
         } else { // unit === 'in'
-            if (tire) { // Full imperial format e.g., 31x10.50R15
-                const match = tire.match(/^(\d{2}(?:[.,]\d)?)[xX](\d{2}(?:[.,]\d)?)[A-Z]*R(\d{2,3}(?:[.,]\d)?)$/);
-                if (!match) {
-                    console.error("Invalid imperial tire format for filtering. Received:", tire);
-                    searchDiameter = Number(String(rim_diameter).replace(',', '.'));
-                } else {
-                    searchWidth = Number(String(match[2]).replace(',', '.')) * 25.4; // Convert width to mm
-                    searchAspectRatio = null;
-                    searchDiameter = Number(String(match[3]).replace(',', '.'));
-                }
-            } else { // Only diameter
-                searchDiameter = Number(String(rim_diameter).replace(',', '.'));
-            }
+            searchDiameter = Number(String(rim_diameter).replace(',', '.'));
         }
 
         const diameterTolerance = 0.5; // Allow +/- 0.5 inch for diameter
@@ -88,20 +77,14 @@ const Tyres = () => {
             const isDiameterMatch = Math.abs(dataDiameter - searchDiameter) <= diameterTolerance;
 
             if (unit === 'mm' && searchWidth && searchAspectRatio) {
-                const widthTolerance = 10; // Allow +/- 10mm for width
-                const aspectRatioTolerance = 5; // Allow +/- 5 for aspect ratio
+                const widthTolerance = 60; // Allow +/- 10mm for width
+                const aspectRatioTolerance = 60; // Allow +/- 20 for aspect ratio
                 const dataWidth = Number(data.Width);
                 const dbWidthInMm = dataWidth < 30 ? dataWidth * 25.4 : dataWidth;
                 const dataAspectRatio = Number(data.AspectRatio);
                 const isWidthMatch = Math.abs(dbWidthInMm - searchWidth) <= widthTolerance;
                 const isAspectRatioMatch = !data.Aspect_Ratio || Math.abs(dataAspectRatio - searchAspectRatio) <= aspectRatioTolerance;
-                return isDiameterMatch;
-            } else if (unit === 'in' && searchWidth) {
-                const widthTolerance = 10;
-                const dataWidth = Number(data.Width);
-                const dbWidthInMm = dataWidth < 30 ? dataWidth * 25.4 : dataWidth;
-                const isWidthMatch = Math.abs(dbWidthInMm - searchWidth) <= widthTolerance * 1.5; // Looser tolerance for inches
-                return isDiameterMatch && isWidthMatch;
+                return isDiameterMatch && isWidthMatch
             }
             return isDiameterMatch;
         });
