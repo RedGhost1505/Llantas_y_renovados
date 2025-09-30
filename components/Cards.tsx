@@ -99,7 +99,7 @@ const Cards: React.FC<CardProps> = ({ tireData }) => {
                 <div className="flex justify-center mb-4">
                   <div className="w-[200px] h-[200px] relative overflow-hidden rounded-lg">
                     <Image
-                      src={`/tires/${tire.Fuente_Imagen}`} // Use Fuente_Imagen and add path
+                      src="/A607(1).jpg" // Use Fuente_Imagen and add path
                       alt="tyre"
                       fill
                       sizes="200px"
