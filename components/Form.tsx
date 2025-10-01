@@ -77,7 +77,7 @@ const Form: React.FC<FormProps> = ({ selectedTires, onBackToCards }) => {
                                 <div>
                                     <p className="font-bold">{tire.Modelo} - {tire.Marca}</p>
                                     <p className="text-sm text-gray-600">
-                                        {tire.width}/{tire.aspect_ratio}/{tire.construction}{tire.diameter}
+                                        {tire.Width}/{tire.Aspect_Ratio}/{tire.Construction}{tire.Diameter}
                                     </p>
                                     <p className="text-sm">Cantidad: {tire.quantity}</p>
                                 </div>
