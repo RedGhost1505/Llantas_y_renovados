@@ -60,7 +60,7 @@ const Slides: React.FC<CarouselProps> = ({ images }) => {
                             <img src={image.url} alt={image.alt} className="absolute w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-80">
                                 <div className="absolute inset-0 flex flex-col justify-center items-center text-white">
-                                    <img src="/favicon1.png" className="w-20" />
+                                    <img src={favicon.src} className="w-20" />
                                     <h2 className="text-3xl font-bold">{image.ub}</h2>
                                     {/* Render image.loc with line breaks and make it clickable */}
                                     <div className="text-md text-center" style={{ cursor: 'pointer' }}>

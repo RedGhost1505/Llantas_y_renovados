@@ -25,6 +25,8 @@ interface Vehicle {
     wheels?: Wheel[];
 }
 
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
+
 const Tyres = () => {
     // Estado para almacenar parámetros de búsqueda
     const [params, setParams] = useState({
@@ -36,7 +38,7 @@ const Tyres = () => {
         tire: '',
         rim_diameter: '',
         logo: '',
-        user_key: process.env.NEXT_PUBLIC_API_KEY,
+        user_key: API_KEY,
     });
 
 
