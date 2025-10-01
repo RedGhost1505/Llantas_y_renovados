@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react';
-import PriceDisplay from './PriceDisplay';
+// import PriceDisplay from './PriceDisplay';
 import Image from 'next/image';
 import { Toaster, toast } from 'sonner';
 
@@ -8,7 +8,7 @@ interface SelectedTire {
     CODIGO: string;
     Modelo: string;
     Marca: string;
-    MAY: number;
+    // MAY: number;
     quantity: number; // Add the quantity property
     [key: string]: any; // Allow other properties
 }
@@ -54,7 +54,7 @@ const Form: React.FC<FormProps> = ({ selectedTires, onBackToCards }) => {
         }
     };
 
-    const totalAmount = selectedTires.reduce((sum, tire) => sum + (tire.MAY * tire.quantity), 0);
+    // const totalAmount = selectedTires.reduce((sum, tire) => sum + (tire.MAY * tire.quantity), 0);
 
     return (
         <div className="flex flex-col justify-center items-center w-full px-5 mt-5">
@@ -82,14 +82,14 @@ const Form: React.FC<FormProps> = ({ selectedTires, onBackToCards }) => {
                                     <p className="text-sm">Cantidad: {tire.quantity}</p>
                                 </div>
                             </div>
-                            <p className="font-bold">
+                            {/* <p className="font-bold">
                                 <PriceDisplay amount={tire.MAY * tire.quantity} />
-                            </p>
+                            </p> */}
                         </div>
                     ))}
-                    <div className="text-right font-bold text-xl">
+                    {/* <div className="text-right font-bold text-xl">
                         Total: <PriceDisplay amount={totalAmount} />
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
