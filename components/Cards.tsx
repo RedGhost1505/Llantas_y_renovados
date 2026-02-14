@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Form from './Form';
 
@@ -22,9 +22,70 @@ interface CardProps {
   tireData: TireDetails[];
 }
 
+// ----------------------------------------------------
+// Nuevo Componente Auxiliar para Fallback de Imagen
+// ----------------------------------------------------
+interface ImageFallbackProps {
+  src: string;
+  alt: string;
+  // Añadir todas las props necesarias para el componente Image
+  fill: boolean;
+  sizes: string;
+  className: string;
+  style: React.CSSProperties;
+}
+
+const ImageFallback: React.FC<ImageFallbackProps> = ({ src, ...props }) => {
+  // Estado para la URL actual de la imagen (puede cambiar si falla)
+  const [currentSrc, setCurrentSrc] = useState(src);
+  // Estado para saber si ya probamos el fallback y evitar bucles infinitos
+  const [triedFallback, setTriedFallback] = useState(false);
+
+  // Resetear la URL cuando la prop 'src' cambie (ej: al cambiar de llanta)
+  useEffect(() => {
+    setCurrentSrc(src);
+    setTriedFallback(false);
+  }, [src]);
+
+  const handleError = useCallback(() => {
+    // Solo si aún no hemos probado el fallback
+    if (!triedFallback) {
+      setTriedFallback(true);
+
+      // La lógica de fallback: si la URL termina en .png, intentar con .jpg
+      if (currentSrc.toLowerCase().endsWith('.png')) {
+        const newSrc = currentSrc.replace(/\.png$/i, '.jpg');
+        setCurrentSrc(newSrc);
+      }
+      // Si la URL termina en .jpg, podríamos intentar con .png (si fuera necesario)
+      // else if (currentSrc.toLowerCase().endsWith('.jpg')) {
+      //     const newSrc = currentSrc.replace(/\.jpg$/i, '.png');
+      //     setCurrentSrc(newSrc);
+      // }
+    }
+  }, [currentSrc, triedFallback]);
+
+  return (
+    <Image
+      {...props}
+      src={currentSrc}
+      onError={handleError}
+    // Opcional: Si incluso el fallback falla, puedes poner una imagen por defecto
+    // Si quieres un placeholder, usa:
+    // onError={error => { handleError(error); error.currentTarget.src = 'URL_IMAGEN_DEFECTO'; }}
+    />
+  );
+};
+// ----------------------------------------------------
+// Fin del Componente Auxiliar
+// ----------------------------------------------------
+
+
 const Cards: React.FC<CardProps> = ({ tireData }) => {
   const [selectedItems, setSelectedItems] = useState<{ [key: string]: number }>({});
   const [showForm, setShowForm] = useState(false);
+
+  // ... (El resto de tus funciones handleAddClick, handleIncrease, handleDecrease, etc., permanecen igual)
 
   const handleAddClick = (tireId: string) => {
     setSelectedItems(prev => ({ ...prev, [tireId]: 1 }));
@@ -98,8 +159,9 @@ const Cards: React.FC<CardProps> = ({ tireData }) => {
               <div className="bg-[#F8F8FE] drop-shadow-lg rounded-lg p-6 h-full flex flex-col">
                 <div className="flex justify-center mb-4">
                   <div className="w-[200px] h-[200px] relative overflow-hidden rounded-lg">
-                    <Image
-                      src="/A607(1).jpg" // Use Fuente_Imagen and add path
+                    {/* ¡USAMOS EL NUEVO COMPONENTE ImageFallback AQUÍ! */}
+                    <ImageFallback
+                      src={`https://www.llantasyrenovado.com.mx/Llantas_y_renovados/Fotos/${tire.Fuente_Imagen}`} // URL inicial de la BD
                       alt="tyre"
                       fill
                       sizes="200px"

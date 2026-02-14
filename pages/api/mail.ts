@@ -65,7 +65,7 @@ export default async function sendEmail(req: NextApiRequest, res: NextApiRespons
 
     const mailOptions = {
         from: process.env.GMAIL_EMAIL,
-        to: 'joshalejandro117@gmail.com',
+        to: 'llantasyrenovadomails@gmail.com',
         subject: `Nueva orden de llantas de: ${firstName} ${lastName}`,
         text: `
             Nueva orden de ${firstName} ${lastName}

@@ -18,9 +18,9 @@ const Hero = () => {
       <div className="pt-36 w-screen">
         <div className="flex flex-col items-center justify-center">
           <Image
-            src="/Promo.png"
+            src="/promo.jpg"
             alt="hero"
-            width={1440}
+            width={1200}
             height={800}
             className="object-contain w-full"
           />
